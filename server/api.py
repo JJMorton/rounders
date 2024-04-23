@@ -2,40 +2,38 @@
 Defines the endpoints available for the database API.
 """
 
+from datetime import datetime
 from typing import Optional
-from flask import Response, jsonify, request
+from flask import request
+from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
 
-from . import app
+import config
+
 from . import db
 from . import models
 
-@app.route('/api/teams')
-def api_teams() -> Response:
+def teams(year: int) -> Pagination:
     """
-    `/api/teams?[year=...]` :
+    `/api/teams?[year=...&page=...&page_size=...]` :
     Responds with a list of `Team`s, optionally filtered by `year`
     """
-    year: Optional[str] = request.args.get('year')
     query = db.select(models.Team).order_by(models.Team.id)
     if year is not None:
-        query = query.where(models.Team.year == int(year))
-    teams = db.session.execute(query).scalars().all()
-    return jsonify(teams)
+        query = query.where(models.Team.year == year)
+    return db.paginate(query, count=False, max_per_page=config.MAX_PAGE_SIZE)
 
-@app.route('/api/teams/<int:id>')
-def api_team(id: int) -> Response:
+def team(id: int) -> models.Team:
     """
     `/api/teams/<id>` :
     Responds with the requested `Team`
     """
     team = db.get_or_404(models.Team, int(id))
-    return jsonify(team)
+    return team
 
-@app.route('/api/teams/<int:id>/players')
-def api_team_members(id: int) -> Response:
+def team_members(id: int) -> Pagination:
     """
-    `/api/teams/<id>/members` :
+    `/api/teams/<id>/members[?page=...&page_size=...]` :
     Responds with the `Member`s of the specified `Team`
     """
     query = db\
@@ -43,32 +41,32 @@ def api_team_members(id: int) -> Response:
         .join(models.Member)\
         .where(models.Member.team_id == int(id))\
         .order_by(models.Player.id) 
-    members = db.session.execute(query).scalars().all()
-    return jsonify(members)
+    return db.paginate(query, count=False, max_per_page=config.MAX_PAGE_SIZE)
 
-@app.route('/api/players')
-def api_players() -> Response:
+def players() -> Pagination:
     """
-    `/api/players` :
+    `/api/players[?page=...&page_size=...]` :
     Responds with a list of `Player`s
     """
-    query = db.select(models.Player).order_by(models.Player.id) 
-    players = db.session.execute(query).scalars().all()
-    return jsonify(players)
+    query = (
+        db
+        .select(models.Player)
+        .order_by(models.Player.id)
+        .paginate(count=False, max_per_page=config.MAX_PAGE_SIZE)
+    )
+    return db.paginate(query, count=False, max_per_page=config.MAX_PAGE_SIZE)
 
-@app.route('/api/players/<int:id>')
-def api_player(id: int) -> Response:
+def player(id: int) -> models.Player:
     """
     `/api/players/<id>` :
     Responds with the requested `Player`
     """
     player = db.get_or_404(models.Player, int(id))
-    return jsonify(player)
+    return player
 
-@app.route('/api/matches')
-def api_matches() -> Response:
+def matches() -> Pagination:
     """
-    `/api/matches[?before=...&after=...&teamid=...` :
+    `/api/matches[?before=...&after=...&teamid=...&page=...&page_size=...]` :
     Responds with a list of `Match`es, optionally filtered by date and team
     """
     before: Optional[str] = request.args.get('before')
@@ -84,14 +82,13 @@ def api_matches() -> Response:
             models.Match.team1_id == int(teamid),
             models.Match.team2_id == int(teamid)
         ))
-    matches = db.session.execute(query).scalars().all()
-    return jsonify(matches)
+    return db.paginate(query, count=False, max_per_page=config.MAX_PAGE_SIZE)
 
-@app.route('/api/matches/<int:id>')
-def api_match(id: int) -> Response:
+def match(id: int) -> models.Match:
     """
     `/api/match/<id>` :
     Responds with the requested `Match`
     """
     match = db.get_or_404(models.Match, int(id))
-    return jsonify(match)
+    return match
+

@@ -14,11 +14,13 @@
         <header>
             <ul id="nav-bar">
                 <li id="home"><a href="/">Summer Rounders</a></li>
+                <li><a href="/teams">Teams</a></li>
                 <li><a href="/about">About</a></li>
             </ul>
         </header>
         <div id="content-wrapper">
             <div id="content">
+                <h1>{{ title }}</h1>
                 {% block content %}{% endblock %}
             </div>
         </div>

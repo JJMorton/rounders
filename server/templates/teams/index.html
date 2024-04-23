@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <div class="centering">
+        <table>
+            <tr><th scope="column" class="left">Name</th></tr>
+            {% for team in pagination %}
+                <tr>
+                    <td class="left"><a href="/teams/{{ team.id }}">{{ team.name }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+
+<section>
+    <div class="centering">
+        <table>
+            <tr>
+                {% for year in years %}
+                    <td class="center"><a href="/teams?year={{ year }}">{{ year }}</a></td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+</section>
+{% endblock %}

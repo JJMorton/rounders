@@ -3,16 +3,17 @@
 	--min-page-width: 350px;
 	--max-page-width: 1100px;
 
+    --corner-radius: 8px;
+    --content-padding: 15px;
+
 	--font-color-dark: #222;
 	--divider-color: #aaa;
 	--divider-color-dark: #666;
 
-	--color-text-dark: #222;
-	--color-text-light: #ddd;
-	--color-strong1: #006d77;
-	--color-strong2: #e29578;
-	--color-mid1: #83c5be;
-	--color-mid2: #ffddd2;
+	--color-text-dark: #111;
+	--color-text-light: #eee;
+	--color-accent: #e29578;
+	--color-mid: #aaaaaa;
 	--color-dim: #edf6f9;
 }
 
@@ -28,6 +29,18 @@ body, html {
 code, pre, tt {
 	font-family: 'Courier New', Courier, monospace;
 }
+
+a {
+    color: var(--color-text-dark);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+a:hover {
+    text-decoration: underline;
+    text-decoration-style: solid;
+}
+
 
 @keyframes bob {
 	0% {
@@ -94,11 +107,68 @@ header > #nav-bar {
 #content {
 	max-width: var(--max-page-width);
 	margin: 0 auto;
+    padding: var(--content-padding);
 }
 
 
+.centering {
+    text-align: center;
+}
+
+.centering > * {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+h1 {
+    font-size: 130%;
+}
+
+
+table {
+    border-radius: var(--corner-radius);
+    overflow: hidden;
+    padding: 0;
+    min-width: 200px;
+}
+
+tr:nth-of-type(odd) {
+    background-color: var(--color-dim);
+}
+
+td.left, th.left {
+    text-align: left;
+}
+
+td.right, th.right {
+    text-align: right;
+}
+
+td.center, th.center {
+    text-align: center;
+}
+
+td, th {
+    padding: 0.5em 1em;
+}
+
+th {
+    background-color: var(--color-accent);
+    color: var(--color-text-dark);
+}
+
+th[scope="column"] {
+    border-bottom: 1px solid var(--color-mid);
+}
+
 footer {
 	margin: 0 max(calc(50% - 0.5 * var(--max-page-width)), 0px);
+    padding: 0 var(--content-padding);
 	border-top: 1px solid var(--divider-color);
+}
+
+footer * {
+    color: var(--color-mid);
 }
 
