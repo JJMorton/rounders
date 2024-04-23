@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {% if title %}
+        <title>{{ title }} - Summer Rounders</title>
+        {% else %}
+        <title>Summer Rounders</title>
+        {% endif %}
+        <link rel="stylesheet" type="text/css" href="/styles/style.css">
+        <script src="https://kit.fontawesome.com/39b6f1d864.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <header>
+            <ul id="nav-bar">
+                <li id="home"><a href="/">Summer Rounders</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </header>
+        <div id="content-wrapper">
+            <div id="content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
+    <footer>
+        <p>Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>
+    </footer>
+</html>

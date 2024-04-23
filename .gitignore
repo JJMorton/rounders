@@ -2,3 +2,4 @@ __pycache__/
 *.db
 *.sublime-*
 pyrightconfig.json
+/instance/
