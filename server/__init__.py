@@ -39,5 +39,4 @@ def _set_sqlite_pragma(dbapi_connection, _):
 # Import submodules
 
 from . import models
-from . import api
 from . import routes

@@ -125,12 +125,20 @@ h1 {
     font-size: 130%;
 }
 
+h2 {
+    font-size: 115%;
+}
+
 
 table {
     border-radius: var(--corner-radius);
     overflow: hidden;
     padding: 0;
     min-width: 200px;
+}
+
+table > caption {
+	font-weight: 600;
 }
 
 tr:nth-of-type(odd) {

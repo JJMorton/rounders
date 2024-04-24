@@ -2,7 +2,7 @@
 Data models to represent entities in the database
 """
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 from . import db, app
@@ -15,6 +15,9 @@ class Team(db.Model):
     id:   Mapped[int] = mapped_column(primary_key=True, nullable=False)
     name: Mapped[str] = mapped_column(nullable=False)
     year: Mapped[int] = mapped_column(nullable=False)
+
+    matches1: Mapped[list["Match"]] = relationship(foreign_keys="Match.team1_id", backref="team1", lazy="dynamic")
+    matches2: Mapped[list["Match"]] = relationship(foreign_keys="Match.team2_id", backref="team2", lazy="dynamic")
 
 class Player(db.Model):
     """
@@ -45,7 +48,6 @@ class Match(db.Model):
     score2:    Mapped[float] = mapped_column(nullable=True)
     play_date: Mapped[int]   = mapped_column(nullable=True)
     """Unix epoch of the start of the date played on"""
-
 
 # Create all the tables based on these models
 with app.app_context():
