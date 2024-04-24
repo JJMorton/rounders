@@ -5,6 +5,7 @@ and their responses.
 
 from datetime import datetime
 from flask import render_template, request
+import pandas as pd
 
 from . import models
 from . import app
@@ -34,25 +35,24 @@ def teams():
         .order_by(models.Team.id)
     ).all()
 
-    # Count number of matches
-    match_counts = [
-        len(team.matches1.all()) + len(team.matches2.all())
-        for team in teams
-    ]
-
-    # Compute the total scores
-    scores = [
-        sum(m.score1 for m in team.matches1.all()) + sum(m.score2 for m in team.matches2.all())
-        for team in teams
-    ]
-
-    # Zip together the teams and total scores, sorting by score
-    table_data = sorted(zip(teams, scores, match_counts), key=lambda x: x[1], reverse=True)
+    # Create table of teams, total scores and play count, sorting by score
+    df = pd.DataFrame(dict(
+        id = [t.id for t in teams],
+        name = [t.name for t in teams],
+        match_count = [
+            len(team.matches1.all()) + len(team.matches2.all())
+            for team in teams
+        ],
+        score = [
+            sum(m.score1 for m in team.matches1.all()) + sum(m.score2 for m in team.matches2.all())
+            for team in teams
+        ]
+    )).sort_values('score')
 
     return render_template(
         'teams/index.html',
         title=f'Teams of {year}',
-        table_data=table_data,
+        table=df,
         year=year,
         years=years,
     )
@@ -63,24 +63,43 @@ def team(id: int):
 
     # Get (score1, score2) from matches where this was team1
     q1 = team.matches1.subquery()
-    query = db.select(models.Team, q1.c.score1, q1.c.score2).join(models.Team, models.Team.id == q1.c.team2_id)
-    matches1 = db.session.execute(query).fetchall()
+    select1 = db.select(
+        models.Team.id,
+        models.Team.name,
+        q1.c.play_date,
+        q1.c.score1,
+        q1.c.score2
+    ).join(models.Team, models.Team.id == q1.c.team2_id)
 
     # Get (score2, score1) from matches where this was team2
     q2 = team.matches2.subquery()
-    query = db.select(models.Team, q2.c.score2, q2.c.score1).join(models.Team, models.Team.id == q2.c.team1_id)
-    matches2 = db.session.execute(query).fetchall()
+    select2 = db.select(
+        models.Team.id,
+        models.Team.name,
+        q2.c.play_date,
+        q2.c.score1,
+        q2.c.score2
+    ).join(models.Team, models.Team.id == q2.c.team1_id)
 
-    table_data = [
-        (team, other_team, this_score, other_score)
-        for other_team, this_score, other_score in (matches1 + matches2)
-    ]
+    matches =\
+        list(db.session.execute(select1).fetchall())\
+        + list(db.session.execute(select2).fetchall())
+
+    matches_df = pd.DataFrame(dict(
+        date = [datetime.fromtimestamp(m.play_date).strftime('%d %b') for m in matches],
+        name1 = [team.name] * len(matches),
+        name2 = [m.name for m in matches],
+        id1 = [team.id] * len(matches),
+        id2 = [m.id for m in matches],
+        score1 = [m.score1 for m in matches],
+        score2 = [m.score2 for m in matches],
+    ))
 
     return render_template(
         'teams/team.html',
         title=f'Team "{team.name}"',
         team=team,
-        table_data=table_data
+        matches=matches_df,
     )
 
 @app.route('/about')

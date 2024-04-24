@@ -5,13 +5,14 @@
     <div class="centering">
         <table>
 	    	<caption>Matches Played</caption>
-            {% for team1, team2, score1, score2 in table_data %}
+            {% for _, match in matches.iterrows() %}
                 <tr>
-                    <th class="center">{{ score1 or 0 }}</td>
-                    <td class="left"><a href="/teams/{{ team1.id }}">{{ team1.name }}</a></td>
+                    <td class="left">{{ match['date'] }}</td>
+                    <th class="center">{{ match['score1'] }}</td>
+                    <td class="left"><a href="/teams/{{ match['id1'] }}">{{ match['name1'] }}</a></td>
                     <td class="center">vs.</td>
-                    <td class="right"><a href="/teams/{{ team2.id }}">{{ team2.name }}</a></td>
-                    <th class="center">{{ score2 or 0 }}</td>
+                    <td class="right"><a href="/teams/{{ match['id2'] }}">{{ match['name2'] }}</a></td>
+                    <th class="center">{{ match['score2'] }}</td>
                 </tr>
             {% endfor %}
         </table>

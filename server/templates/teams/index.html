@@ -9,11 +9,11 @@
                 <th scope="column" class="right">Points</th>
                 <th scope="column" class="right">No. of Games</th>
             </tr>
-            {% for team, score, count in table_data %}
+            {% for _, row in table.iterrows() %}
                 <tr>
-                    <td class="left"><a href="/teams/{{ team.id }}">{{ team.name }}</a></td>
-                    <td class="right">{{ score or 0 }}</td>
-                    <td class="right">{{ count or 0 }}</td>
+                    <td class="left"><a href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
+                    <td class="right">{{ row['score'] or 0 }}</td>
+                    <td class="right">{{ row['match_count'] or 0 }}</td>
                 </tr>
             {% endfor %}
         </table>
