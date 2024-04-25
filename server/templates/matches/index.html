@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <section>
     <figure>
-        {% include 'partials/team_table.html' %}
+    	{% include 'partials/match_table.html' %}
     </figure>
 </section>
 
@@ -11,7 +12,7 @@
     <ul class="page-nav">
         <li class="title">View year</li>
         {% for year in years %}
-            <li><a href="/teams?year={{ year }}">{{ year }}</a></td>
+            <li><a href="/matches?year={{ year }}">{{ year }}</a></td>
         {% endfor %}
     </ul>
 </section>

@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <section>
-    <div class="centering">
-        <table>
-	    	<caption>Matches Played</caption>
-            {% for _, match in matches.iterrows() %}
-                <tr>
-                    <td class="left">{{ match['date'] }}</td>
-                    <th class="center">{{ match['score1'] }}</td>
-                    <td class="left"><a href="/teams/{{ match['id1'] }}">{{ match['name1'] }}</a></td>
-                    <td class="center">vs.</td>
-                    <td class="right"><a href="/teams/{{ match['id2'] }}">{{ match['name2'] }}</a></td>
-                    <th class="center">{{ match['score2'] }}</td>
-                </tr>
+    <figure>
+        <figcaption>Team Members</figcaption>
+        <ul class="players">
+            {% for _, player in players.iterrows() %}
+                <li class="player">{{ player['name_first'] }} {{ player['name_last'] }}</li>
             {% endfor %}
-        </table>
-    </div>
+        </ul>
+    </figure>
 </section>
+
+<section>
+    <figure>
+        <figcaption>Matches</figcaption>
+        {% include 'partials/match_table.html' %}
+    </figure>
+</section>
+
 {% endblock %}

@@ -1,0 +1,16 @@
+<table>
+    <tr>
+        <th scope="column" class="left">Name</th>
+        <td class="colgap"></td>
+        <th scope="column" class="right">Points</th>
+        <th scope="column" class="right">No. of Games</th>
+    </tr>
+    {% for _, row in teams.iterrows() %}
+        <tr>
+            <td class="left"><a href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
+	        <td class="colgap"></td>
+            <td class="right">{{ row['score'] or 0 }}</td>
+            <td class="right">{{ row['match_count'] or 0 }}</td>
+        </tr>
+    {% endfor %}
+</table>

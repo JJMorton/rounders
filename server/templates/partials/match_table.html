@@ -1,0 +1,18 @@
+<table class="matches">
+	<tr>
+		<th scope="column">Date</th>
+		<td class="colgap"></td>
+		<th colspan="5" scope="column">Match</th>
+	</tr>
+    {% for _, match in matches.iterrows() %}
+        <tr class="{{ 'played' if match['played'] else 'scheduled' }}">
+            <td class="left">{{ match['date'] }}</td>
+            <td class="colgap"></td>
+            <td class="center {{ 'win' if match['score1'] >= match['score2'] else 'loss' }}">{{ match['score1'] }}</td>
+            <td class="right"><a href="/teams/{{ match['id1'] }}">{{ match['name1'] }}</a></td>
+            <td class="center">vs.</td>
+            <td class="left"><a href="/teams/{{ match['id2'] }}">{{ match['name2'] }}</a></td>
+            <td class="center {{ 'win' if match['score2'] >= match['score1'] else 'loss' }}">{{ match['score2'] }}</td>
+        </tr>
+    {% endfor %}
+</table>
