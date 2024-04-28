@@ -3,5 +3,6 @@ __pycache__/
 *.sublime-*
 pyrightconfig.json
 /instance/
+.env
 
 !/example/*

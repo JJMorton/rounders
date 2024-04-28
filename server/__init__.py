@@ -4,6 +4,10 @@ The Flask server and SQLite database
 
 import config
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
@@ -24,6 +28,7 @@ class ModelBase(DeclarativeBase, MappedAsDataclass):
     """Base class for models"""
     pass
 
+# Initialise database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{config.DATABASE_FILE}"
 db = SQLAlchemy(app=app, model_class=ModelBase)
 
@@ -40,3 +45,4 @@ def _set_sqlite_pragma(dbapi_connection, _):
 
 from . import models
 from . import routes
+from . import auth

@@ -27,6 +27,11 @@
         </div>
     </body>
     <footer>
-        <p>Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>
+        <p style="float: left;">Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>
+        {% if current_user.is_authenticated %}
+            <p style="float: right;"><a href="/logout">Log Out</a></p>
+        {% else %}
+            <p style="float: right;"><a href="/login">Admin Login</a></p>
+        {% endif %}
     </footer>
 </html>
