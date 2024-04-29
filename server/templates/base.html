@@ -9,6 +9,7 @@
         {% endif %}
         <link rel="stylesheet" type="text/css" href="/styles/style.css">
         <script src="https://kit.fontawesome.com/39b6f1d864.js" crossorigin="anonymous"></script>
+        <script src="/scripts/script.js"></script>
     </head>
     <body>
         <header>
@@ -25,6 +26,20 @@
                 {% block content %}{% endblock %}
             </div>
         </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <dialog class="flash" open>
+            <div class="header flex-row">
+                <p class="title">{{ messages[-1] }}</p>
+                <form method="dialog">
+                    <button autofocus class="large-button"><i class="fa-solid fa-xmark"></i></button>
+                </form>
+            </div>
+        </dialog>
+        {% endif %}
+        {% endwith %}
+
     </body>
     <footer>
         <p style="float: left;">Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>

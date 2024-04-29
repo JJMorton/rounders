@@ -18,7 +18,7 @@ from . import db
 def home():
     return render_template('home/index.html', title='Home')
 
-@app.route('/teams')
+@app.route('/teams/')
 def route_teams():
     # Get a list of all teams
 
@@ -60,7 +60,7 @@ def route_teams():
         years = years,
     )
 
-@app.route('/teams/<int:id>')
+@app.route('/teams/<int:id>/')
 def route_team(id: int):
     team = db.get_or_404(Team, int(id))
 
@@ -124,7 +124,7 @@ def route_team(id: int):
         players = players_df,
     )
 
-@app.route('/matches')
+@app.route('/matches/')
 def route_matches():
 
     # Get a list of available years
@@ -178,6 +178,6 @@ def route_matches():
         year    = year,
     )
 
-@app.route('/about')
+@app.route('/about/')
 def route_about():
     return render_template('about/index.html', title='About')

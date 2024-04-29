@@ -53,6 +53,7 @@ def route_login_post():
         flask.flash("Invalid login")
         return flask.redirect("/login")
 
+    flask.flash("Logged in")
     login_user(admin_user, remember=False)
     return flask.redirect('/')
 
@@ -61,4 +62,5 @@ def route_login_post():
 @login_required
 def logout():
     logout_user()
+    flask.flash("Logged out")
     return flask.redirect("/")

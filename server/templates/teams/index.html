@@ -1,6 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<script>window.year = {{ year }};</script>
+<script src="/scripts/teams.js"></script>
+
+{% if current_user.is_authenticated %}
+
+<div id="button-create-team" class="button-label-container">
+    <button name="create-team" class="large-button"><i class="fa-solid fa-plus"></i></button>
+    <label for="create-team">Create Team</label>
+</div>
+
+<dialog id="dialog-create-team">
+    <div class="header flex-row">
+        <p class="title">Create Team</p>
+        <form method="dialog">
+            <button autofocus class="large-button"><i class="fa-solid fa-xmark"></i></button>
+        </form>
+    </div>
+    <div class="content">
+        <form method="POST" action="/createteam?year={{ year }}&next={{ request.url }}">
+            <input type="text" name="name" placeholder="Team Name" required>
+            <p>Choose players:</p>
+            <ul id="available-players" class="checkbox-list"></ul>
+            <button class="large-button" type="submit">Create</button>
+        </form>
+    </div>
+</dialog>
+
+<div id="button-remove-teams" class="button-label-container">
+    <button name="remove-teams" class="large-button"><i class="fa-solid fa-trash"></i></button>
+    <label for="remove-teams">Remove Teams</label>
+</div>
+
+<dialog id="dialog-remove-teams">
+    <div class="header flex-row">
+        <p class="title">Remove Teams</p>
+        <form method="dialog">
+            <button autofocus class="large-button"><i class="fa-solid fa-xmark"></i></button>
+        </form>
+    </div>
+    <div class="content">
+        <form method="POST" action="/removeteams?next={{ request.url }}">
+            <p><strong>WARNING</strong>: This will remove all associated matches</p>
+            <p>Choose teams to <strong>remove</strong>:</p>
+            <ul id="available-teams" class="checkbox-list"></ul>
+            <button class="large-button" type="submit">Remove</button>
+        </form>
+    </div>
+</dialog>
+
+{% endif %}
+
 <section>
     <figure>
         {% include 'partials/team_table.html' %}

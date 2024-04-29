@@ -2,6 +2,8 @@
 The Flask server and SQLite database
 """
 
+from dataclasses import asdict, dataclass
+from typing import Any
 import config
 
 # Load environment variables from .env file
@@ -24,7 +26,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static', stati
 # --------------------------------------------
 # Set up the database
 
-class ModelBase(DeclarativeBase, MappedAsDataclass):
+class ModelBase(DeclarativeBase):
     """Base class for models"""
     pass
 
@@ -45,4 +47,6 @@ def _set_sqlite_pragma(dbapi_connection, _):
 
 from . import models
 from . import routes
+from . import api
+from . import posts
 from . import auth
