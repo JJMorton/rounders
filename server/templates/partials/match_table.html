@@ -5,22 +5,22 @@
                 <div class="match">
                     <div class="date">{{ format_date(match['date']) }}</div>
                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
-                    <span class="score">
-                        <span class="score1">{{ match['score1'] }}</span>
-                        :
-                        <span class="score2">{{ match['score2'] }}</span>
+                    <span>
+                        <span class="score">{{ match['score1'] }}</span>
+                        <span class="versus">:</span>
+                        <span class="score">{{ match['score2'] }}</span>
                     </span>
                     <a class="team highlight" href="/teams/{{ match['teamid2'] }}">{{ match['name2'] }}</a>
                 </div>
                 {% if current_user.is_authenticated %}
                     <div class="options">
                         <div class="button-label-container" onclick="confirmDialog('Remove this match?', '/matches/{{ match['id'] }}/remove?next={{ request.url }}')">
-                            <button name="remove-match" class="large-button"><i class="fa-solid fa-trash"></i></button>
+                            <button name="remove-match" class="small-button"><i class="fa-solid fa-trash"></i></button>
                             <label for="remove-match">Remove</label>
                         </div>
                         <a href="/matches/{{ match['id'] }}/edit?next={{ request.url }}">
                             <div class="button-label-container">
-                                <button name="edit-match" class="large-button"><i class="fa-solid fa-pencil"></i></button>
+                                <button name="edit-match" class="small-button"><i class="fa-solid fa-pencil"></i></button>
                                 <label for="edit-match">Edit</label>
                             </div>
                         </a>

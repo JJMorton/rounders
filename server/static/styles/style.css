@@ -295,13 +295,10 @@ select {
 	text-decoration: none;
 }
 
-button.large-button {
+button {
 	background-color: var(--color-accent);
-	min-width: 2.5em;
-	height: 2.5em;
-	padding: 6px;
-	outline: none;
 	box-shadow: var(--shadow);
+	outline: none;
 	border: none;
 	border-radius: var(--corner-radius);
 	cursor: pointer;
@@ -309,7 +306,21 @@ button.large-button {
 	align-items: center;
 	justify-content: center;
 	gap: 5px;
+}
+
+button.large-button {
+	min-width: 2.5em;
+	height: 2.5em;
+	padding: 6px;
 	font-size: 90%;
+}
+
+button.small-button {
+	min-width: 2em;
+	height: 2em;
+	padding: 3px;
+	border-radius: calc(var(--corner-radius) * 0.7);
+	font-size: 70%;
 }
 
 button.large-button.cancel {
@@ -400,16 +411,18 @@ ul.matches .match {
 }
 
 ul.matches .score {
+	display: inline-block;
 	background-color: var(--color-accent);
-	width: 100px;
-	padding: 5px 15px;
-	margin: 0 10px;
+	width: 50px;
+	padding: 5px 0;
+	margin: 0 5px;
 	border-radius: var(--corner-radius);
 	white-space: nowrap;
+	font-weight: bold;
 }
 
-ul.matches .score span {
-	font-weight: bold;
+ul.matches .versus {
+	margin: 0 5px;
 }
 
 ul.matches .team {
