@@ -506,8 +506,3 @@ def route_remove_match_post(id):
 
     flash(f"Removed match")
     return redirect(redirect_url)
-
-
-@app.route('/about/')
-def route_about():
-    return render_template('about/index.html', title='About')
