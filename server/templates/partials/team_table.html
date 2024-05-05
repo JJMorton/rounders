@@ -1,16 +1,31 @@
-<table>
-    <tr>
-        <th scope="column" class="left">Name</th>
-        <td class="colgap"></td>
-        <th scope="column" class="right">Points</th>
-        <th scope="column" class="right">No. of Games</th>
-    </tr>
-    {% for _, row in teams.iterrows() %}
+<figure>
+    <table>
         <tr>
-            <td class="left"><a href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
-	        <td class="colgap"></td>
-            <td class="right">{{ row['score'] or 0 }}</td>
-            <td class="right">{{ row['match_count'] or 0 }}</td>
+            <th scope="column" class="left">Name</th>
+            <td class="colgap"></td>
+            <th scope="column" class="right">Points</th>
+            <th scope="column" class="right">No. of Games</th>
+            {% if current_user.is_authenticated %}
+                <th scope="column">Action</th>
+            {% endif %}
         </tr>
-    {% endfor %}
-</table>
+        {% for _, row in teams.iterrows() %}
+            <tr>
+                <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
+    	        <td class="colgap"></td>
+                <td class="right">{{ row['score'] or 0 }}</td>
+                <td class="right">{{ row['match_count'] or 0 }}</td>
+                {% if current_user.is_authenticated %}
+                    <td class="center">
+                        <button class="large-button" title="Remove" onclick="confirmDialog('Remove {{ row['name'] }}?', '/teams/{{ row['id'] }}/remove?next={{ request.url }}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <a href="/teams/{{ row['id'] }}/edit?next={{ request.url }}">
+                            <button class="large-button" title="Edit" onclick="editTeam({{ row['id'] }})"><i class="fa-solid fa-pencil"></i></button>
+                        </a>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</figure>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section>
+
+    <form method="POST" action="/teams/{{ id }}/edit?next={{ next }}">
+    	<input type="hidden" name="year" value="{{ year }}"/>
+        <input type="text" value="{{ name }}" disabled>
+        <fieldset>
+            <legend>Choose players</legend>
+            <select multiple name="players" id="select-players" size="10">
+	            {% for _, player in players.iterrows() %}
+	            	<option {{ 'selected' if player['id'] in member_ids else '' }} value="{{ player['id'] }}">{{ player['name_first'] }} {{ player['name_last'] }}</option>
+	            {% endfor %}
+            </select>
+        </fieldset>
+    	<a href="{{ next }}">
+    		<button type="button" class="large-button cancel">Cancel</button>
+    	</a>
+		<button type="reset" class="large-button cancel">Reset</button>
+        <button class="large-button" type="submit">Update</button>
+    </form>
+
+</section>
+
+{% endblock %}

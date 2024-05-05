@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import warnings
 import flask
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash
@@ -7,6 +8,10 @@ from os import environ
 # Set the secret key on flask
 from . import app
 app.secret_key = environ.get("SECRET_KEY")
+if app.secret_key is None:
+    warnings.warn("SECRET_KEY environment variable is not defined")
+if environ.get("ADMIN_PASSWORD_HASH") is None:
+    warnings.warn("ADMIN_PASSWORD_HASH environment variable is not defined")
 
 
 # Initialise the login manager

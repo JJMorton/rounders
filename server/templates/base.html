@@ -14,31 +14,42 @@
     <body>
         <header>
             <ul id="nav-bar">
-                <li id="home"><a href="/">Summer Rounders</a></li>
+                <li id="home"><a href="/"><img src="/images/cover.jpg"></a></li>
                 <li><a href="/matches">Matches</a></li>
                 <li><a href="/teams">Teams</a></li>
                 <li><a href="/about">About</a></li>
             </ul>
         </header>
-        <div id="content-wrapper">
-            <div id="content">
-                <h1>{{ title }}</h1>
-                {% block content %}{% endblock %}
-            </div>
-        </div>
 
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <dialog class="flash" open>
-            <div class="header flex-row">
-                <p class="title">{{ messages[-1] }}</p>
+        <dialog id="dialog-confirm-action" class="question">
+            <div class="header">
+                <p class="title" id="confirm-title"></p>
+            </div>
+            <div class="content">
                 <form method="dialog">
-                    <button autofocus class="large-button"><i class="fa-solid fa-xmark"></i></button>
+                    <button autofocus class="large-button cancel">Cancel</button>
+                </form>
+                <form method="POST" action="" id="confirm-form">
+                    <button class="large-button" type="submit">Remove</button>
                 </form>
             </div>
         </dialog>
-        {% endif %}
-        {% endwith %}
+
+        <div id="content-wrapper">
+            <div id="content">
+                <h1>{{ title }}</h1>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                    <div class="flash"><p>{{ message }}</p></div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
 
     </body>
     <footer>

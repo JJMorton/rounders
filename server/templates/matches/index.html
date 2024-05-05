@@ -2,17 +2,26 @@
 
 {% block content %}
 
+{% if current_user.is_authenticated %}
+
+<div id="button-create-match" class="button-label-container">
+    <a href="/matches/create?year={{ year }}&next={{ request.url }}">
+        <button name="create-match" class="large-button"><i class="fa-solid fa-plus"></i></button>
+        <label for="create-match">Create Match</label>
+    </a>
+</div>
+
+{% endif %}
+
 <section>
-    <figure>
-    	{% include 'partials/match_table.html' %}
-    </figure>
+	{% include 'partials/match_table.html' %}
 </section>
 
 <section>
     <ul class="page-nav">
         <li class="title">View year</li>
         {% for year in years %}
-            <li><a href="/matches?year={{ year }}">{{ year }}</a></td>
+            <li><a class="highlight" href="/matches?year={{ year }}">{{ year }}</a></td>
         {% endfor %}
     </ul>
 </section>

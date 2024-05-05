@@ -2,8 +2,6 @@
 The Flask server and SQLite database
 """
 
-from dataclasses import asdict, dataclass
-from typing import Any
 import config
 
 # Load environment variables from .env file
@@ -12,7 +10,7 @@ load_dotenv()
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
@@ -48,5 +46,5 @@ def _set_sqlite_pragma(dbapi_connection, _):
 from . import models
 from . import routes
 from . import api
-from . import posts
 from . import auth
+from . import formatting

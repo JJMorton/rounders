@@ -20,3 +20,11 @@ async function paginated(url) {
 
 	return results;
 }
+
+function confirmDialog(title, action) {
+
+	document.getElementById("confirm-title").textContent = title;
+	document.getElementById("confirm-form").setAttribute("action", action);
+	document.getElementById("dialog-confirm-action").showModal();
+
+}
