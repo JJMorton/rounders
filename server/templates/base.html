@@ -14,7 +14,7 @@
     <body>
         <header>
             <ul id="nav-bar">
-                <li id="home"><a href="/"><img src="/images/cover.jpg"></a></li>
+                <li id="home"><a href="/">Home</a></li>
                 <li><a href="/matches">Matches</a></li>
                 <li><a href="/teams">Teams</a></li>
             </ul>
@@ -52,11 +52,15 @@
 
     </body>
     <footer>
-        <p style="float: left;">Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>
-        {% if current_user.is_authenticated %}
-            <p style="float: right;"><a href="/logout">Log Out</a></p>
-        {% else %}
-            <p style="float: right;"><a href="/login">Admin Login</a></p>
-        {% endif %}
+        <div class="left">
+            <p>Made by Jack Morton, source on <a href="https://github.com/JJMorton/rounders">GitHub</a></p>
+        </div>
+        <div class="right">
+            {% if current_user.is_authenticated %}
+                <p><a href="/logout">Log Out</a></p>
+            {% else %}
+                <p><a href="/login">Admin Login</a></p>
+            {% endif %}
+        </div>
     </footer>
 </html>
