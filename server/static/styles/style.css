@@ -436,12 +436,16 @@ ul.matches .options {
 /* Footer */
 
 footer {
+	flex: 1;
 	margin-top: 40px;
 	background-color: var(--color-dim);
 	padding: 0 max(calc(50% - 0.5 * var(--max-page-width)), 0px);
 	display: flex;
 	flex-direction: row;
-	flex: 1;
+}
+
+footer > * {
+	padding: 0 var(--content-padding);
 }
 
 footer > .right {
