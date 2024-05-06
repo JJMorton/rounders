@@ -506,6 +506,7 @@ def route_edit_match(id):
         timestamp = match.play_date,
         score1    = match.score1,
         score2    = match.score2,
+        year      = match.team1.year,
         next      = request.args.get('next', default='/matches/create')
     )
 
