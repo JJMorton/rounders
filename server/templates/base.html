@@ -12,6 +12,7 @@
         <script src="/scripts/script.js"></script>
     </head>
     <body>
+
         <header>
             <ul id="nav-bar">
                 <li id="home"><a href="/">Home</a></li>
@@ -20,6 +21,7 @@
             </ul>
         </header>
 
+        <!-- Confirmation dialog -->
         <dialog id="dialog-confirm-action" class="question">
             <div class="header">
                 <p class="title" id="confirm-title"></p>
@@ -50,17 +52,18 @@
             </div>
         </div>
 
+        <footer>
+            <div class="left">
+                <p>Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
+            </div>
+            <div class="right">
+                {% if current_user.is_authenticated %}
+                    <p><a href="/logout">Log Out</a></p>
+                {% else %}
+                    <p><a href="/login">Admin Login</a></p>
+                {% endif %}
+            </div>
+        </footer>
+
     </body>
-    <footer>
-        <div class="left">
-            <p>Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
-        </div>
-        <div class="right">
-            {% if current_user.is_authenticated %}
-                <p><a href="/logout">Log Out</a></p>
-            {% else %}
-                <p><a href="/login">Admin Login</a></p>
-            {% endif %}
-        </div>
-    </footer>
 </html>
