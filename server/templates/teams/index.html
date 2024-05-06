@@ -4,8 +4,6 @@
 
 {% if current_user.is_authenticated %}
 
-<script src="/scripts/teams.js"></script>
-
 <div id="button-create-team" class="button-label-container">
     <a href="/teams/create?year={{ year }}&next={{ request.url }}">
         <button name="create-team" class="large-button"><i class="fa-solid fa-plus"></i></button>
@@ -16,6 +14,9 @@
 {% endif %}
 
 <section>
+    {% with winning=teams[teams['points'] == teams.iloc[0]['points']] %}
+        <h2>Current Leader{{ 's' if winning.shape[0] > 1 else '' }}: {{ ', '.join(winning['name']) }}</h2>
+    {% endwith %}
     {% include 'partials/team_table.html' %}
 </section>
 

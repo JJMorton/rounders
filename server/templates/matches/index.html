@@ -13,9 +13,23 @@
 
 {% endif %}
 
-<section>
-	{% include 'partials/match_table.html' %}
-</section>
+{% with matches=matches[matches['played']] %}
+{% if matches.size > 0 %}
+    <section>
+        <h2>Results</h2>
+    	{% include 'partials/match_table.html' %}
+    </section>
+{% endif %}
+{% endwith %}
+
+{% with matches=matches[matches['played'] == False] %}
+{% if matches.size > 0 %}
+    <section>
+        <h2>Scheduled</h2>
+        {% include 'partials/match_table.html' %}
+    </section>
+{% endif %}
+{% endwith %}
 
 <section>
     <ul class="page-nav">

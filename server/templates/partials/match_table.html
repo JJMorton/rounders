@@ -5,10 +5,14 @@
                 <div class="match">
                     <div class="date">{{ format_date(match['date']) }}</div>
                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
-                    <span>
-                        <span class="score">{{ match['score1'] }}</span>
-                        <span class="versus">:</span>
-                        <span class="score">{{ match['score2'] }}</span>
+                    <span class="details">
+                        {% if match['score1'] != '--' or match['score2'] != '--' %}
+                            <span class="score">{{ match['score1'] }}</span>
+                            <span class="versus">:</span>
+                            <span class="score">{{ match['score2'] }}</span>
+                        {% else %}
+                            vs.
+                        {% endif %}
                     </span>
                     <a class="team highlight" href="/teams/{{ match['teamid2'] }}">{{ match['name2'] }}</a>
                 </div>

@@ -3,8 +3,8 @@
 {% block content %}
 
 <section>
+    <h2>Members</h2>
     <figure>
-        <figcaption>Team Members</figcaption>
         <ul class="players">
             {% for _, player in players.iterrows() %}
                 <li class="player">{{ player['name_first'] }} {{ player['name_last'] }}</li>
@@ -14,7 +14,7 @@
 </section>
 
 <section>
-    <h1>Matches</h1>
+    <h2>Matches</h2>
     {% include 'partials/match_table.html' %}
 </section>
 

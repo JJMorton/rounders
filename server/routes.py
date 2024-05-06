@@ -3,7 +3,7 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 from flask import flash, redirect, render_template, request
 from flask_login import login_required
@@ -19,7 +19,34 @@ from . import db
 
 @app.route('/')
 def home():
-    return render_template('home/index.html', title='Home')
+
+    now = datetime.now()
+    today = datetime(year=now.year, month=now.month, day=now.day)
+    weekstart = (today - timedelta(days=today.weekday())).timestamp()
+    weekend = (today + timedelta(days=7 - today.weekday())).timestamp()
+    matches = db.session.scalars(
+        db
+        .select(Match)
+        .filter(and_(Match.play_date >= weekstart, Match.play_date < weekend))
+    ).all()
+
+    # Create dataframe, sort by newest first
+    matches_df = pd.DataFrame(dict(
+        date    = [m.play_date for m in matches],
+        id      = [m.id for m in matches],
+        name1   = [m.team1.name for m in matches],
+        name2   = [m.team2.name for m in matches],
+        teamid1 = [m.id for m in matches],
+        teamid2 = [m.id for m in matches],
+        score1  = [m.score1 if m.score1 != None else '--' for m in matches],
+        score2  = [m.score2 if m.score2 != None else '--' for m in matches],
+    )).sort_values('date')
+
+    return render_template(
+        'home/index.html',
+        matches=matches_df,
+        title='Home',
+    )
 
 
 @app.route('/teams/')
@@ -42,23 +69,41 @@ def route_teams():
         .order_by(Team.id)
     ).all()
 
-    matches1 = [team.matches1.all() for team in teams]
-    matches2 = [team.matches2.all() for team in teams]
+    matches1 = [team.matches1.where(Match.score1 != None).all() for team in teams]
+    matches2 = [team.matches2.where(Match.score2 != None).all() for team in teams]
+
+    # # Ignore unplayed matches
+    # matches1 = [m for m in matches1 if m.score1 is not None and m.score2 is not None]
+    # matches2 = [m for m in matches2 if m.score1 is not None and m.score2 is not None]
+
+    played = [len(m1) + len(m2) for m1, m2 in zip(matches1, matches2)]
+    wins = [
+        len([m for m in m1 if m.score1 > m.score2])
+        + len([m for m in m2 if m.score2 > m.score1])
+        for m1, m2 in zip(matches1, matches2)
+    ]
+    losses = [
+        len([m for m in m1 if m.score1 < m.score2])
+        + len([m for m in m2 if m.score2 < m.score1])
+        for m1, m2 in zip(matches1, matches2)
+    ]
+    draws = [p - w - l for p, w, l in zip(played, wins, losses)]
+    points = [2 * w + d for w, d in zip(wins, draws)]
 
     # Create table of teams, total scores and play count, sorting by score
     teams_df = pd.DataFrame(dict(
         id          = [t.id for t in teams],
         name        = [t.name for t in teams],
-        match_count = [len(m1) + len(m2) for m1, m2 in zip(matches1, matches2)],
-        score       = [
-            sum(m.score1 or 0 for m in m1) + sum(m.score2 or 0 for m in m2)
-            for m1, m2 in zip(matches1, matches2)
-        ]
-    )).sort_values('score')
+        match_count = played,
+        points      = points,
+        wins        = wins,
+        draws       = draws,
+        losses      = losses,
+    )).sort_values('points', ascending=False)
 
     return render_template(
         'teams/index.html',
-        title = f'Teams of {year}',
+        title = f'Standings of {year}',
         teams = teams_df,
         year  = year,
         years = years,
@@ -96,13 +141,12 @@ def route_team(id: int):
         q2.c.score1
     ).join(Team, Team.id == q2.c.team1_id)
 
-    # Sort by date, put unscheduled matches at the top (newest)
-    matches = sorted(
-        list(db.session.execute(select1).fetchall()) + list(db.session.execute(select2).fetchall()),
-        key=lambda m: m[2] or datetime.now().timestamp() * 2,
-        reverse=True,
+    matches = (
+        list(db.session.execute(select1).fetchall())
+        + list(db.session.execute(select2).fetchall())
     )
 
+    # Sort by date, put unscheduled matches at the top (newest)
     matches_df = pd.DataFrame(dict(
         date    = [m.play_date for m in matches],
         id      = [m[2] for m in matches],
@@ -113,7 +157,7 @@ def route_team(id: int):
         score1  = [m[4] if m[4] != None else '--' for m in matches],
         score2  = [m[5] if m[5] != None else '--' for m in matches],
         played  = [m[4] != None or m[5] != None for m in matches],
-    ))
+    )).sort_values('date', ascending=False)
 
     players_df = pd.DataFrame(dict(
         name_first = [p.name_first for p in players],
@@ -348,7 +392,7 @@ def route_matches():
         score1  = [m[0].score1 if m[0].score1 != None else '--' for m in matches],
         score2  = [m[0].score2 if m[0].score2 != None else '--' for m in matches],
         played  = [m[0].score1 != None or m[0].score2 != None for m in matches],
-    )).sort_values('date')
+    )).sort_values('date', ascending=False)
 
     return render_template(
         'matches/index.html',
@@ -423,6 +467,11 @@ def route_create_match_post():
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)
 
+    # If one team is awarded points, the other should get 0
+    if score1 != None or score2 != None:
+        if score1 == None: score1 = 0
+        if score2 == None: score2 = 0
+
     match = Match(
         team1_id=team1_id,
         team2_id=team2_id,
@@ -475,6 +524,11 @@ def route_edit_match_post(id):
 
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)
+
+    # If one team is awarded points, the other should get 0
+    if score1 != None or score2 != None:
+        if score1 == None: score1 = 0
+        if score2 == None: score2 = 0
 
     match.play_date = date
     match.score1 = score1

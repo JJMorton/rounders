@@ -1,6 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<section>
+	<table class="quick-overview">
+		<tr>
+			<td class="question">What?</td>
+			<td class="answer">A summer rounders tournament organised by postgrads, for postgrads!</td>
+		</tr>
+		<tr>
+			<td class="question">When?</td>
+			<td class="answer">TBC</td>
+		</tr>
+		<tr>
+			<td class="question">Who?</td>
+			<td class="answer">Organised by Tom Joshi-Cale, email <address><a class="highlight" href="mailto:tj294@exeter.ac.uk">tj294@exeter.ac.uk</a></address> to register your team.</td>
+		</tr>
+		<tr>
+			<td class="question">How?</td>
+			<td class="answer">It's very casual, but <a class="highlight" href="https://drive.google.com/file/d/1mpTTU5WA96HXpSN05VX1e-NlRD9xA3fR/view?usp=sharing" target="_blank">here's an outline of the rules</a> if you need to brush up!</td>
+		</tr>
+		<tr>
+			<td class="question">Where?</td>
+			<td class="answer">
+				The Exwick Cricket Club grounds!
+				<iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3091.634485509637!2d-3.5458249049514396!3d50.72486091575009!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x486da5ac925d2877%3A0x919190ab2f80eb73!2sExwick%20Cricket%20Club%20Home%20Ground!5e0!3m2!1sen!2suk!4v1714951892025!5m2!1sen!2suk" width="500" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+			</td>
+		</tr>
+	</table>
+</section>
+
 <section>
 </section>
+
+{% if matches.size > 0 %}
+<section>
+	<h2>Matches this week</h2>
+	{% include 'partials/match_table.html' %}
+</section>
+{% endif %}
+
 {% endblock %}
