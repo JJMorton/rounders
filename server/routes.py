@@ -220,6 +220,11 @@ def route_create_team_post():
         return redirect(redirect_url)
 
     name = request.form.get("name")
+    # Very basic sanitisation, just to prevent mistakes.
+    # Doesn't need to be elaborate, as long as I'm aware of where
+    # the name is being used.
+    forbid_chars = ['\\', '\'', '"', ';', '<', '>']
+    if name: name = ''.join(ch for ch in name if not ch in forbid_chars)
     if not name:
         flash("Invalid team name")
         return redirect(redirect_url)
