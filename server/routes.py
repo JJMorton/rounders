@@ -36,8 +36,8 @@ def home():
         id      = [m.id for m in matches],
         name1   = [m.team1.name for m in matches],
         name2   = [m.team2.name for m in matches],
-        teamid1 = [m.id for m in matches],
-        teamid2 = [m.id for m in matches],
+        teamid1 = [m.team1.id for m in matches],
+        teamid2 = [m.team2.id for m in matches],
         score1  = [m.score1 if m.score1 != None else '--' for m in matches],
         score2  = [m.score2 if m.score2 != None else '--' for m in matches],
     )).sort_values('date')
