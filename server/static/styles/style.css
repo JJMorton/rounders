@@ -472,7 +472,7 @@ ul.matches .match {
 	background-color: var(--color-dim);
 	border-radius: var(--corner-radius);
 	padding: 10px;
-	height: 50px;
+	min-height: 50px;
 	box-sizing: border-box;
 }
 
