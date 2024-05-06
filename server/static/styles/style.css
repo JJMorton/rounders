@@ -420,6 +420,14 @@ td.colgap {
 	background-color: white;
 }
 
+table.many-row-input {
+	box-shadow: none;
+}
+
+table.many-row-input input[type="text"] {
+	height: 1em;
+}
+
 
 /* Home page */
 

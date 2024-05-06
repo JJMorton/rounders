@@ -17,6 +17,14 @@ from . import config
 from . import db
 
 
+def basic_sanitisation(s: str) -> str:
+    # Very basic sanitisation, just to prevent mistakes.
+    # Doesn't need to be elaborate, as long as I'm aware of where
+    # the string is being used.
+    forbid_chars = ['\\', '\'', '"', ';', '<', '>']
+    return ''.join(ch for ch in s if not ch in forbid_chars)
+
+
 @app.route('/')
 def home():
 
@@ -223,15 +231,24 @@ def route_create_team_post():
     # Very basic sanitisation, just to prevent mistakes.
     # Doesn't need to be elaborate, as long as I'm aware of where
     # the name is being used.
-    forbid_chars = ['\\', '\'', '"', ';', '<', '>']
-    if name: name = ''.join(ch for ch in name if not ch in forbid_chars)
-    if not name:
+    if name:
+        name = basic_sanitisation(name)
+    else:
         flash("Invalid team name")
         return redirect(redirect_url)
 
-    player_ids = [
-        int(id)
-        for id in request.form.getlist("players")
+    # Find corresponding existing players, or create new ones
+    first_names = request.form.getlist("name-first")
+    last_names = request.form.getlist("name-last")
+    players = [
+        db.session.scalars(
+            db
+            .select(Player)
+            .where(and_(Player.name_first == first, Player.name_last == last))
+        ).first()
+        or
+        Player(name_first=basic_sanitisation(first), name_last=basic_sanitisation(last))
+        for first, last in zip(first_names, last_names)
     ]
 
     team = Team(name=name, year=year)
@@ -239,12 +256,12 @@ def route_create_team_post():
     db.session.commit()
 
     team_id = team.id
-    if not team_id:
+    if not team_id or any(not player.id for player in players):
         flash("Something went wrong")
         return redirect(redirect_url)
 
-    for player_id in player_ids:
-        member = Member(player_id=player_id, team_id=team_id)
+    for player in players:
+        member = Member(player_id=player.id, team_id=team_id)
         db.session.add(member)
 
     db.session.commit()
@@ -292,9 +309,18 @@ def route_edit_team_post(id):
 
     redirect_url = request.args.get("next", default=f'/teams?year={team.year}', type=str)
 
-    player_ids = [
-        int(id)
-        for id in request.form.getlist("players")
+    # Find corresponding existing players, or create new ones
+    first_names = request.form.getlist("name-first")
+    last_names = request.form.getlist("name-last")
+    players = [
+        db.session.scalars(
+            db
+            .select(Player)
+            .where(and_(Player.name_first == first, Player.name_last == last))
+        ).first()
+        or
+        Player(name_first=basic_sanitisation(first), name_last=basic_sanitisation(last))
+        for first, last in zip(first_names, last_names)
     ]
 
     members = db.session.scalars(
@@ -307,8 +333,8 @@ def route_edit_team_post(id):
         db.session.delete(member)
     db.session.commit()
 
-    for id in player_ids:
-        member = Member(player_id=id, team_id=team.id)
+    for player in players:
+        member = Member(player_id=player.id, team_id=team.id)
         db.session.add(member)
     db.session.commit()
 

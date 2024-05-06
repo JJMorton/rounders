@@ -8,12 +8,42 @@
     	<input type="hidden" name="year" value="{{ year }}"/>
         <input type="text" name="name" placeholder="Team Name" required>
         <fieldset>
-            <legend>Choose players</legend>
-            <select multiple name="players" id="select-players" size="10">
-	            {% for _, player in players.iterrows() %}
-	            	<option value="{{ player['id'] }}">{{ player['name_first'] }} {{ player['name_last'] }}</option>
-	            {% endfor %}
-            </select>
+            <legend>Players</legend>
+
+            <datalist id="list-name-first">
+                {% for _, player in players.iterrows() %}
+                    <option value="{{ player['name_first'] }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <datalist id="list-name-last">
+                {% for _, player in players.iterrows() %}
+                    <option value="{{ player['name_last'] }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <table class="many-row-input">
+                <template>
+                    <tr>
+                        <td><input required type="text" name="name-first" placeholder="First Name" list="list-name-first"/></td>
+                        <td><input required type="text" name="name-last" placeholder="Last Name" list="list-name-last"/></td>
+                        <td><button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                </template>
+                <thead>
+                    <tr>
+                        <td colspan=3 class="button-label-container" onclick="addRow(this)">
+                            <button type="button" name="add-player" class="large-button">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <label for="add-player">Add Player</label>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
         </fieldset>
     	<a href="{{ next }}">
     		<button type="button" class="large-button cancel">Cancel</button>

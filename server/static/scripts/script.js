@@ -22,9 +22,34 @@ async function paginated(url) {
 }
 
 function confirmDialog(title, action) {
-
 	document.getElementById("confirm-title").textContent = title;
 	document.getElementById("confirm-form").setAttribute("action", action);
 	document.getElementById("dialog-confirm-action").showModal();
-
 }
+
+function parentOfType(elt, tag) {
+	let e = elt;
+	while (e !== null && e.tagName.toLowerCase() !== tag.toLowerCase()) {
+		e = e.parentElement;
+	}
+	if (!e) throw Error(`Could not find parent with type ${tag} of element`, elt);
+	return e;
+}
+
+function addRow(button) {
+	const table = parentOfType(button, 'table');
+	const templ = table.querySelector('template');
+	if (!templ) throw Error('No row template found in table');
+
+	const newRow = templ.content.cloneNode(true);
+	const input = newRow.querySelector('input');
+	table.querySelector('tbody').appendChild(newRow);
+	// Focus the first input if there is one
+	if (input) input.focus();
+}
+
+function removeRow(button) {
+	const row = parentOfType(button, 'tr');	
+	row.remove();
+}
+
