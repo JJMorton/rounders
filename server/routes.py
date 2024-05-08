@@ -11,7 +11,7 @@ import pandas as pd
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 
-from .models import Team, Player, Member, Match
+from .models import Team, Player, Match
 from . import app
 from . import config
 from . import db
@@ -80,10 +80,6 @@ def route_teams():
     matches1 = [team.matches1.where(Match.score1 != None).all() for team in teams]
     matches2 = [team.matches2.where(Match.score2 != None).all() for team in teams]
 
-    # # Ignore unplayed matches
-    # matches1 = [m for m in matches1 if m.score1 is not None and m.score2 is not None]
-    # matches2 = [m for m in matches2 if m.score1 is not None and m.score2 is not None]
-
     played = [len(m1) + len(m2) for m1, m2 in zip(matches1, matches2)]
     wins = [
         len([m for m in m1 if m.score1 > m.score2])
@@ -121,11 +117,6 @@ def route_teams():
 @app.route('/teams/<int:id>/')
 def route_team(id: int):
     team = db.get_or_404(Team, int(id))
-
-    # Get all player names
-    players = db.session.scalars(
-        db.select(Player).join(team.members.subquery())
-    ).all()
 
     # Get (score1, score2) from matches where this was team1
     q1 = team.matches1.subquery()
@@ -168,8 +159,8 @@ def route_team(id: int):
     )).sort_values('date', ascending=False)
 
     players_df = pd.DataFrame(dict(
-        name_first = [p.name_first for p in players],
-        name_last  = [p.name_last for p in players],
+        name_first = [p.name_first for p in team.players],
+        name_last  = [p.name_last for p in team.players],
     ))
 
     return render_template(
@@ -237,34 +228,34 @@ def route_create_team_post():
         flash("Invalid team name")
         return redirect(redirect_url)
 
-    # Find corresponding existing players, or create new ones
-    first_names = request.form.getlist("name-first")
-    last_names = request.form.getlist("name-last")
-    players = [
-        db.session.scalars(
-            db
-            .select(Player)
-            .where(and_(Player.name_first == first, Player.name_last == last))
-        ).first()
-        or
-        Player(name_first=basic_sanitisation(first), name_last=basic_sanitisation(last))
-        for first, last in zip(first_names, last_names)
-    ]
-
-    team = Team(name=name, year=year)
+    team = Team(name=name, year=year) # type: ignore
     db.session.add(team)
     db.session.commit()
 
     team_id = team.id
-    if not team_id or any(not player.id for player in players):
+    if not team_id:
         flash("Something went wrong")
         return redirect(redirect_url)
 
-    for player in players:
-        member = Member(player_id=player.id, team_id=team_id)
-        db.session.add(member)
+    # Find corresponding existing players, or create new ones
+    first_names = request.form.getlist("name-first")
+    last_names = request.form.getlist("name-last")
+    players = [
+        Player(
+            team_id=team_id,
+            name_first=basic_sanitisation(first),
+            name_last=basic_sanitisation(last),
+        ) # type: ignore
+        for first, last in zip(first_names, last_names)
+    ]
 
+    for player in players:
+        db.session.add(player)
     db.session.commit()
+
+    if not all(player.id for player in players):
+        flash("Something went wrong")
+        return redirect(redirect_url)
 
     flash(f"Created team '{name}'")
     return redirect(redirect_url)
@@ -276,18 +267,11 @@ def route_edit_team(id):
 
     team = db.get_or_404(Team, int(id))
 
-    # Fetch the players
-    players = db.session.scalars(
-        db
-        .select(Player)
-        .order_by(Player.name_last)
-    ).all()
-
     # Create table of teams for the form options
     players_df = pd.DataFrame(dict(
-        id         = [p.id for p in players],
-        name_first = [p.name_first for p in players],
-        name_last = [p.name_last for p in players],
+        id         = [p.id for p in team.players],
+        name_first = [p.name_first for p in team.players],
+        name_last = [p.name_last for p in team.players],
     )).sort_values('name_last')
 
     return render_template(
@@ -295,9 +279,8 @@ def route_edit_team(id):
         title      = f'Edit Team "{team.name}"',
         id         = team.id,
         name       = team.name,
-        member_ids = [m.player_id for m in team.members],
         players    = players_df,
-        next       = request.args.get('next', default='/teams/create')
+        next       = request.args.get('next', default='/teams/create', type=str)
     )
 
 
@@ -306,37 +289,30 @@ def route_edit_team(id):
 def route_edit_team_post(id):
 
     team = db.get_or_404(Team, int(id))
-
     redirect_url = request.args.get("next", default=f'/teams?year={team.year}', type=str)
 
-    # Find corresponding existing players, or create new ones
+    # Delete and re-create all players
+    for player in team.players:
+        db.session.delete(player)
+
     first_names = request.form.getlist("name-first")
     last_names = request.form.getlist("name-last")
     players = [
-        db.session.scalars(
-            db
-            .select(Player)
-            .where(and_(Player.name_first == first, Player.name_last == last))
-        ).first()
-        or
-        Player(name_first=basic_sanitisation(first), name_last=basic_sanitisation(last))
+        Player(
+            team_id=team.id,
+            name_first=basic_sanitisation(first),
+            name_last=basic_sanitisation(last),
+        ) # type: ignore
         for first, last in zip(first_names, last_names)
     ]
 
-    members = db.session.scalars(
-        db
-        .select(Member)
-        .where(Member.team_id == team.id)
-    )
-
-    for member in members:
-        db.session.delete(member)
-    db.session.commit()
-
     for player in players:
-        member = Member(player_id=player.id, team_id=team.id)
-        db.session.add(member)
+        db.session.add(player)
     db.session.commit()
+
+    if not all(player.id != None for player in players):
+        flash("Something went wrong")
+        return redirect(redirect_url)
 
     flash(f"Updated team '{team.name}'")
     return redirect(redirect_url)
@@ -346,24 +322,15 @@ def route_edit_team_post(id):
 @login_required
 def route_remove_team_post(id):
 
+    team = db.get_or_404(Team, int(id))
     redirect_url = request.args.get("next", default=f'/teams', type=str)
-
-    team = db.session.scalars(
-        db
-        .select(Team)
-        .where(Team.id == id)
-    ).first()
-
-    if not team:
-        flash("Attempted to remove non-existent team")
-        return redirect(redirect_url)
 
     team_name = team.name
 
-    members = db.session.scalars(
+    players = db.session.scalars(
         db
-        .select(Member)
-        .where(Member.team_id == team.id)
+        .select(Player)
+        .where(Player.team_id == team.id)
     )
 
     matches = db.session.scalars(
@@ -378,8 +345,8 @@ def route_remove_team_post(id):
     for match in matches:
         db.session.delete(match)
 
-    for member in members:
-        db.session.delete(member)
+    for player in players:
+        db.session.delete(player)
 
     db.session.delete(team)
     db.session.commit()
@@ -493,7 +460,7 @@ def route_create_match_post():
 
     date_str = request.form.get("date")
     time_str = request.form.get("time") or "00:00"
-    date = parser.parse(f'{date_str}T{time_str}:00Z').timestamp() if date_str else None
+    date = int(parser.parse(f'{date_str}T{time_str}:00Z').timestamp()) if date_str else None
 
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)
@@ -509,7 +476,7 @@ def route_create_match_post():
         score1=score1,
         score2=score2,
         play_date=date
-    )
+    ) # type: ignore
 
     db.session.add(match)
     db.session.commit()
@@ -552,7 +519,7 @@ def route_edit_match_post(id):
 
     date_str = request.form.get("date")
     time_str = request.form.get("time") or "00:00"
-    date = parser.parse(f'{date_str}T{time_str}:00Z').timestamp() if date_str else None
+    date = int(parser.parse(f'{date_str}T{time_str}:00Z').timestamp()) if date_str else None
 
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)

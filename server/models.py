@@ -2,8 +2,6 @@
 Data models to represent entities in the database
 """
 
-from dataclasses import dataclass
-from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
@@ -26,7 +24,7 @@ class Team(db.Model):
     """Matches in which this was the first team"""
     matches2: Mapped[list["Match"]] = relationship(foreign_keys="Match.team2_id", back_populates="team2", lazy="dynamic")
     """Matches in which this was the second team"""
-    members: Mapped[list["Member"]] = relationship(foreign_keys="Member.team_id", back_populates="team", lazy="dynamic")
+    players: Mapped[list["Player"]] = relationship(foreign_keys="Player.team_id", back_populates="team", lazy="dynamic")
     """Members of this team"""
 
 
@@ -38,29 +36,13 @@ class Player(db.Model):
 
     # Columns
     id:         Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    team_id:    Mapped[int] = mapped_column(ForeignKey('teams.id'), nullable=False)
     name_first: Mapped[str] = mapped_column(nullable=False)
     name_last:  Mapped[str] = mapped_column(nullable=False)
 
     # Relationships
-    as_members: Mapped[list["Member"]] = relationship(back_populates="player", lazy="dynamic")
-    """The team members that this player functions as"""
-
-
-class Member(db.Model):
-    """
-    Represents a player as part of a team
-    """
-    __tablename__ = "members"
-
-    # Columns
-    player_id: Mapped[int] = mapped_column(ForeignKey('players.id'), primary_key=True, nullable=False)
-    team_id:   Mapped[int] = mapped_column(ForeignKey('teams.id'), primary_key=True, nullable=False)
-
-    # Relationships
-    player: Mapped["Player"] = relationship(back_populates="as_members")
-    """The player acting as this team member"""
-    team: Mapped["Team"] = relationship(back_populates="members")
-    """The team which the member is a part of"""
+    team: Mapped["Team"] = relationship(back_populates="players")
+    """The team which the player is a part of"""
 
 
 class Match(db.Model):

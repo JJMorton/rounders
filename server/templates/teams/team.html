@@ -2,6 +2,7 @@
 
 {% block content %}
 
+{% if players.size > 0 %}
 <section>
     <h2>Members</h2>
     <figure>
@@ -12,10 +13,13 @@
         </ul>
     </figure>
 </section>
+{% endif %}
 
+{% if matches.size > 0 %}
 <section>
     <h2>Matches</h2>
     {% include 'partials/match_table.html' %}
 </section>
+{% endif %}
 
 {% endblock %}
