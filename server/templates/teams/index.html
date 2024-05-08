@@ -15,9 +15,6 @@
 
 {% if teams.size > 0 %}
     <section>
-        {% with winning=teams[teams['points'] == teams.iloc[0]['points']] %}
-            <h2>Current Leader{{ 's' if winning.shape[0] > 1 else '' }}: {{ ', '.join(winning['name']) }}</h2>
-        {% endwith %}
         {% include 'partials/team_table.html' %}
     </section>
 {% endif %}
