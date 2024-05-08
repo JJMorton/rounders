@@ -77,18 +77,31 @@ def route_teams():
         .order_by(Team.id)
     ).all()
 
-    matches1 = [team.matches1.where(Match.score1 != None).all() for team in teams]
-    matches2 = [team.matches2.where(Match.score2 != None).all() for team in teams]
+    # Fetch all matches played
+    matches1 = [
+        team.matches1.where(or_(Match.score1 != None, Match.score2 != None)).all()
+        for team in teams
+    ]
+    matches2 = [
+        team.matches2.where(or_(Match.score1 != None, Match.score2 != None)).all()
+        for team in teams
+    ]
 
+    # Compute no. of plays, wins, losses, etc.
+    # Need to account for the fact that a DNF loses to zero, so
+    # treat as -1.
+
+    # Function `comp` returns True if score `s1` wins over score `s2`
+    comp = lambda s1, s2: (-1 if s1 is None else s1) > (-1 if s2 is None else s2)
     played = [len(m1) + len(m2) for m1, m2 in zip(matches1, matches2)]
     wins = [
-        len([m for m in m1 if m.score1 > m.score2])
-        + len([m for m in m2 if m.score2 > m.score1])
+        len([m for m in m1 if comp(m.score1, m.score2)])
+        + len([m for m in m2 if comp(m.score2, m.score1)])
         for m1, m2 in zip(matches1, matches2)
     ]
     losses = [
-        len([m for m in m1 if m.score1 < m.score2])
-        + len([m for m in m2 if m.score2 < m.score1])
+        len([m for m in m1 if comp(m.score2, m.score1)])
+        + len([m for m in m2 if comp(m.score1, m.score2)])
         for m1, m2 in zip(matches1, matches2)
     ]
     draws = [p - w - l for p, w, l in zip(played, wins, losses)]
@@ -465,11 +478,6 @@ def route_create_match_post():
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)
 
-    # If one team is awarded points, the other should get 0
-    if score1 != None or score2 != None:
-        if score1 == None: score1 = 0
-        if score2 == None: score2 = 0
-
     match = Match(
         team1_id=team1_id,
         team2_id=team2_id,
@@ -523,11 +531,6 @@ def route_edit_match_post(id):
 
     score1 = request.form.get("score1", default=None, type=float)
     score2 = request.form.get("score2", default=None, type=float)
-
-    # If one team is awarded points, the other should get 0
-    if score1 != None or score2 != None:
-        if score1 == None: score1 = 0
-        if score2 == None: score2 = 0
 
     match.play_date = date
     match.score1 = score1
