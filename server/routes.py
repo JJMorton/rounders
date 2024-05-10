@@ -3,7 +3,8 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from typing import Optional
 from dateutil import parser
 from flask import flash, redirect, render_template, request
 from flask_login import login_required
@@ -392,9 +393,22 @@ def route_matches():
         .filter(and_(team1.year == year, team2.year == year))
     ).fetchall()
 
+
+    def timestamp_to_week_start(timestamp: Optional[int]) -> int:
+        if timestamp is None:
+            return -1
+        d = datetime.fromtimestamp(timestamp)
+        monday = d - timedelta(days = d.weekday())
+        return int(datetime(monday.year, monday.month, monday.day, tzinfo=UTC).timestamp())
+
+
     # Create dataframe, sort by newest first
     matches_df = pd.DataFrame(dict(
         date    = [m[0].play_date for m in matches],
+        week    = [
+            timestamp_to_week_start(m[0].play_date)
+            for m in matches
+        ],
         id      = [m[0].id for m in matches],
         name1   = [m[1].name for m in matches],
         name2   = [m[2].name for m in matches],
@@ -403,7 +417,7 @@ def route_matches():
         score1  = [m[0].score1 if m[0].score1 != None else '--' for m in matches],
         score2  = [m[0].score2 if m[0].score2 != None else '--' for m in matches],
         played  = [m[0].score1 != None or m[0].score2 != None for m in matches],
-    )).sort_values('date', ascending=False)
+    )).sort_values('date', ascending=False, na_position='last')
 
     return render_template(
         'matches/index.html',

@@ -14,19 +14,33 @@
 {% endif %}
 
 {% with matches=matches[matches['played']] %}
-{% if matches.size > 0 %}
+    {% if matches|length > 0 %}
     <section>
         <h2>Results</h2>
-    	{% include 'partials/match_table.html' %}
+        {% for week, matches in matches.groupby('week') %}
+            {% if week >= 0 %}
+                <p class="date-group">Week of {{ format_date(week) }}</p>
+            {% else %}
+                <p class="date-group">Date TBC</p>
+            {% endif %}
+        	{% include 'partials/match_table.html' %}
+        {% endfor %}
     </section>
-{% endif %}
+    {% endif %}
 {% endwith %}
 
 {% with matches=matches[matches['played'] == False] %}
-{% if matches.size > 0 %}
+{% if matches|length > 0 %}
     <section>
         <h2>Scheduled</h2>
-        {% include 'partials/match_table.html' %}
+        {% for week, matches in matches.groupby('week') %}
+            {% if week >= 0 %}
+                <p class="date-group">Week of {{ format_date(week) }}</p>
+            {% else %}
+                <p class="date-group">Date TBC</p>
+            {% endif %}
+            {% include 'partials/match_table.html' %}
+        {% endfor %}
     </section>
 {% endif %}
 {% endwith %}

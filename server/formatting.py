@@ -4,10 +4,17 @@ from datetime import datetime, UTC
 from math import isnan
 
 def format_date(timestamp: int) -> str:
+    """Creates a date abbreviation to display to the user"""
+    return (
+        datetime.fromtimestamp(timestamp, UTC).strftime('%a %d %b')
+        if timestamp != None and not isnan(timestamp) else 'TBC'
+    )
+
+def format_time(timestamp: int) -> str:
     """Creates a date-time abbreviation to display to the user"""
     return (
-        datetime.fromtimestamp(timestamp, UTC).strftime('%d %b %H:%M')
-        if timestamp != None and not isnan(timestamp) else 'TBC'
+        datetime.fromtimestamp(timestamp, UTC).strftime('%H:%M')
+        if timestamp != None and not isnan(timestamp) else ''
     )
 
 def prepare_for_date_input(timestamp: int) -> str:
@@ -28,6 +35,7 @@ def prepare_for_time_input(timestamp: int) -> str:
 # Allow for use in templates
 app.jinja_env.globals.update(
     format_date=format_date,
+    format_time=format_time,
     prepare_for_date_input=prepare_for_date_input,
     prepare_for_time_input=prepare_for_time_input,
 )

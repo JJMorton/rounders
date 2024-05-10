@@ -3,7 +3,10 @@
         {% for _, match in matches.iterrows() %}
             <li>
                 <div class="match">
-                    <div class="date">{{ format_date(match['date']) }}</div>
+                    <div class="datetime">
+                        <span class="date">{{ format_date(match['date']) }}</span>
+                        <span class="time">{{ format_time(match['date']) }}</span>
+                    </div>
                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
                     <span class="details">
                         {% if match['score1'] != '--' or match['score2'] != '--' %}

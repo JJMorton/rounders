@@ -514,15 +514,27 @@ ul.matches .team {
 	white-space: nowrap;
 }
 
-ul.matches .date {
-	width: 100px;
+ul.matches .datetime > * {
+	width: 120px;
 	font-weight: bold;
+	display: block;
+}
+
+.date-group {
+	font-size: 80%;
+	color: var(--color-mid);
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
 }
 
 @media (width <= 800px) {
 	ul.matches .match {
 		flex-direction: column;
 		gap: 10px;
+	}
+	ul.matches .datetime > * {
+		display: inline;
 	}
 }
 
