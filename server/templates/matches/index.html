@@ -17,7 +17,7 @@
     {% if matches|length > 0 %}
     <section>
         <h2>Results</h2>
-        {% for week, matches in matches.groupby('week') %}
+        {% for week, matches in matches.groupby('week', sort=False) %}
             {% if week >= 0 %}
                 <p class="date-group">Week of {{ format_date(week) }}</p>
             {% else %}
@@ -33,7 +33,7 @@
 {% if matches|length > 0 %}
     <section>
         <h2>Scheduled</h2>
-        {% for week, matches in matches.groupby('week') %}
+        {% for week, matches in matches.groupby('week', sort=False) %}
             {% if week >= 0 %}
                 <p class="date-group">Week of {{ format_date(week) }}</p>
             {% else %}
