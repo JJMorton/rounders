@@ -162,6 +162,7 @@ header > #nav-bar {
 
 #nav-bar #home img {
 	padding: var(--content-padding) 0;
+	height: var(--nav-height);
 	box-sizing: border-box;
 	margin-right: var(--content-padding);
 }
@@ -170,6 +171,7 @@ header > #nav-bar {
 	header > #nav-bar {
 		height: auto;
 		flex-direction: column;
+		position: relative;
 	}
 	#nav-bar > li {
 		width: 100%;
@@ -177,6 +179,12 @@ header > #nav-bar {
 	}
 	#nav-bar > li > a {
 		line-height: var(--mobile-nav-size);
+	}
+	#nav-bar #home img {
+		position: absolute;
+		height: 100%;
+		left: 20%;
+		opacity: 0.1;
 	}
 }
 
