@@ -128,7 +128,7 @@ header > #nav-bar {
 }
 
 #nav-bar > li {
-	width: 150px;
+	min-width: 150px;
 	transition: background-color 200ms;
 }
 
@@ -141,8 +141,9 @@ header > #nav-bar {
 }
 
 #nav-bar > li > a {
-	display: block;
+	display: inline-block;
 	padding: 0 20px;
+	width: 100%;
 	box-sizing: border-box;
 	line-height: var(--nav-height);
 	color: var(--color-text-light);
@@ -152,6 +153,17 @@ header > #nav-bar {
 	font-size: 120%;
 	letter-spacing: 2px;
 	font-weight: bold;
+}
+
+#nav-bar > li > a > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#nav-bar #home img {
+	padding: var(--content-padding) 0;
+	box-sizing: border-box;
+	margin-right: var(--content-padding);
 }
 
 @media (orientation: portrait) {
