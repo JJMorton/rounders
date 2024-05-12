@@ -576,3 +576,8 @@ def route_remove_match_post(id):
 
     flash(f"Removed match")
     return redirect(redirect_url)
+
+
+@app.route('/rules')
+def route_rules():
+    return render_template('rules/index.html', title="Rules")
