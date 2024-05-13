@@ -72,13 +72,16 @@
 
         <footer>
             <div class="left">
-                <p>Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
+                <p><i class="fa-solid fa-wand-magic-sparkles"></i> Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
+                {% if millis %}
+                    <code id="millis">Constructed response in {{ '%.4f' % millis }}ms</code>
+                {% endif %}
             </div>
             <div class="right">
                 {% if current_user.is_authenticated %}
-                    <p><a href="/logout">Log Out</a></p>
+                    <p><a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></p>
                 {% else %}
-                    <p><a href="/login">Admin Login</a></p>
+                    <p><a href="/login"><i class="fa-solid fa-right-to-bracket"></i> Admin Login</a></p>
                 {% endif %}
             </div>
         </footer>

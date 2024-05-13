@@ -11,11 +11,23 @@ from flask_login import login_required
 import pandas as pd
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
+from time import perf_counter
 
 from .models import Team, Player, Match
 from . import app
 from . import config
 from . import db
+
+
+class Timer:
+    start_time: float
+
+    def __init__(self):
+        self.start_time = perf_counter()
+
+    @property
+    def elapsed_ms(self) -> float:
+        return perf_counter() - self.start_time
 
 
 def basic_sanitisation(s: str) -> str:
@@ -28,6 +40,7 @@ def basic_sanitisation(s: str) -> str:
 
 @app.route('/')
 def home():
+    timer = Timer()
 
     now = datetime.now()
     today = datetime(year=now.year, month=now.month, day=now.day)
@@ -55,11 +68,14 @@ def home():
         'home/index.html',
         matches=matches_df,
         title='Home',
+        millis=timer.elapsed_ms
     )
 
 
 @app.route('/teams/')
 def route_teams():
+    timer = Timer()
+
     # Get a list of all teams
 
     # Get a list of available years
@@ -125,11 +141,14 @@ def route_teams():
         teams = teams_df,
         year  = year,
         years = years,
+        millis=timer.elapsed_ms,
     )
 
 
 @app.route('/teams/<int:id>/')
 def route_team(id: int):
+    timer = Timer()
+
     team = db.get_or_404(Team, int(id))
 
     # Get (score1, score2) from matches where this was team1
@@ -183,12 +202,14 @@ def route_team(id: int):
         team    = team,
         matches = matches_df,
         players = players_df,
+        millis=timer.elapsed_ms,
     )
 
 
 @app.route('/teams/create', methods=["GET"])
 @login_required
 def route_create_team():
+    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -217,7 +238,8 @@ def route_create_team():
         title   = f"New Team ({year})",
         players = players_df,
         year    = year,
-        next    = request.args.get('next', default='/teams/create')
+        next    = request.args.get('next', default='/teams/create'),
+        millis  = timer.elapsed_ms,
     )
 
 
@@ -278,6 +300,7 @@ def route_create_team_post():
 @app.route('/teams/<int:id>/edit', methods=["GET"])
 @login_required
 def route_edit_team(id):
+    timer = Timer()
 
     team = db.get_or_404(Team, int(id))
 
@@ -294,7 +317,8 @@ def route_edit_team(id):
         id         = team.id,
         name       = team.name,
         players    = players_df,
-        next       = request.args.get('next', default='/teams/create', type=str)
+        next       = request.args.get('next', default='/teams/create', type=str),
+        millis     = timer.elapsed_ms,
     )
 
 
@@ -371,6 +395,7 @@ def route_remove_team_post(id):
 
 @app.route('/matches/')
 def route_matches():
+    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -425,12 +450,14 @@ def route_matches():
         matches = matches_df,
         years   = years,
         year    = year,
+        millis  = timer.elapsed_ms,
     )
 
 
 @login_required
 @app.route('/matches/create', methods=["GET"])
 def route_create_match():
+    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -459,7 +486,8 @@ def route_create_match():
         title = f"New Match ({year})",
         teams = teams_df,
         year  = year,
-        next  = request.args.get('next', default='/matches/create')
+        next  = request.args.get('next', default='/matches/create'),
+        millis=timer.elapsed_ms,
     )
 
 
@@ -514,6 +542,7 @@ def route_create_match_post():
 @login_required
 @app.route('/matches/<int:id>/edit', methods=["GET"])
 def route_edit_match(id):
+    timer = Timer()
 
     match = db.get_or_404(Match, int(id))
 
@@ -527,7 +556,8 @@ def route_edit_match(id):
         score1    = match.score1,
         score2    = match.score2,
         year      = match.team1.year,
-        next      = request.args.get('next', default='/matches/create')
+        next      = request.args.get('next', default='/matches/create'),
+        millis    = timer.elapsed_ms,
     )
 
 
