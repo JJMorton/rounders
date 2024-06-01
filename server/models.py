@@ -2,6 +2,7 @@
 Data models to represent entities in the database
 """
 
+from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
@@ -55,9 +56,9 @@ class Match(db.Model):
     id:        Mapped[int]   = mapped_column(primary_key=True, nullable=False)
     team1_id:  Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
     team2_id:  Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
-    score1:    Mapped[float] = mapped_column(nullable=True)
-    score2:    Mapped[float] = mapped_column(nullable=True)
-    play_date: Mapped[int]   = mapped_column(nullable=True)
+    score1:    Mapped[Optional[float]] = mapped_column(nullable=True)
+    score2:    Mapped[Optional[float]] = mapped_column(nullable=True)
+    play_date: Mapped[Optional[int]]   = mapped_column(nullable=True)
     """Unix epoch of the start of the date played on"""
 
     # Relationships
