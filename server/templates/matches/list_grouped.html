@@ -1,0 +1,39 @@
+<!--
+INPUTS:
+- groupby: str
+- matches: DataFrameGroupBy with columns
+  'date' (timestamp of match)
+  'week' (timestamp of week start)
+  'id'
+  'name1'
+  'name2'
+  'teamid1'
+  'teamid2'
+  'score1'
+  'score2'
+  'played'
+-->
+
+{% if matches|length == 0 %}
+<p>No matches yet, check back later!</p>
+{% endif %}
+
+{% with matches=matches[matches['played'] == False] %}
+	{% if matches|length > 0 %}
+	    <h2>Scheduled</h2>
+	    {% for group, matches in matches.groupby(groupby) %}
+	        <p class="group-title">{{ group }}</p>
+	        {% include 'matches/list.html' %}
+	    {% endfor %}
+	{% endif %}
+{% endwith %}
+
+{% with matches=matches[matches['played']] %}
+    {% if matches|length > 0 %}
+	    <h2>Results</h2>
+	    {% for group, matches in matches.groupby(groupby) %}
+	        <p class="group-title">{{ group }}</p>
+	    	{% include 'matches/list.html' %}
+	    {% endfor %}
+    {% endif %}
+{% endwith %}

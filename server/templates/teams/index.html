@@ -4,28 +4,49 @@
 
 {% if current_user.is_authenticated %}
 
-<div id="button-create-team" class="button-label-container">
-    <a href="/teams/create?year={{ year }}&next={{ request.url }}">
-        <button name="create-team" class="large-button"><i class="fa-solid fa-plus"></i></button>
-        <label for="create-team">Create Team</label>
-    </a>
-</div>
+<section class="filters">
+    <div id="button-create-team" class="button-label-container">
+        <a href="/teams/create?year={{ year }}&next={{ request.url }}">
+            <button name="create-team" class="large-button"><i class="fa-solid fa-plus"></i></button>
+            <label for="create-team">Create Team</label>
+        </a>
+    </div>
+</section>
 
-{% endif %}
-
-{% if teams.size > 0 %}
-    <section>
-        {% include 'partials/team_table.html' %}
-    </section>
 {% endif %}
 
 <section>
-    <ul class="page-nav">
-        <li class="title">View year</li>
-        {% for year in years %}
-            <li><a class="highlight" href="/teams?year={{ year }}">{{ year }}</a></td>
-        {% endfor %}
-    </ul>
+    <form class="filters" autocomplete="off" hx-get="{{ request.path }}" hx-target="#table-container" hx-trigger="change" hx-replace-url="true">
+        <div class="filter">
+            <label for="year">Year</label>
+            <select name="year" id="year">
+                {% for y in years %}
+                    <option value="{{ y }}" {{ 'selected' if y == year else '' }}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label for="sortby">Sort By</label>
+            <select name="sortby" id="sortby">
+                {% for k, v in dict(points='Points', name='Name', difference='Avg Score Difference').items() %}
+                    <option value="{{ k }}" {{ 'selected' if k == request.args.get('sortby') else '' }}>{{ v }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label for="detailed">
+                <input type="checkbox" name="detailed" id="detailed" {{ 'checked' if detailed else '' }}/>
+                Show Details
+            </label>
+        </div>
+        <i class="htmx-indicator fa-solid fa-spinner"></i>
+    </form>
 </section>
+
+{% if teams.size > 0 %}
+    <section id="table-container">
+        {% include 'teams/table.html' %}
+    </section>
+{% endif %}
 
 {% endblock %}

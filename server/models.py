@@ -2,11 +2,21 @@
 Data models to represent entities in the database
 """
 
+from __future__ import annotations
+
 from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from dataclasses import dataclass
 
 from . import db, app
+
+
+@dataclass(frozen=True)
+class Score:
+    """A match result, from the POV of a given 'home' team"""
+    home: Optional[float]
+    away: Optional[float]
 
 
 class Team(db.Model):
@@ -66,6 +76,37 @@ class Match(db.Model):
     """The first team of this match"""
     team2: Mapped["Team"] = relationship(foreign_keys="Match.team2_id", back_populates="matches2")
     """The second team of this match"""
+
+    @property
+    def winner(self) -> Optional[Team]:
+        """The winning team, if has been played and not a draw"""
+        s1 = -1 if self.score1 is None else self.score1
+        s2 = -1 if self.score2 is None else self.score2
+        if s1 == s2: return None
+        return self.team1 if s1 > s2 else self.team2
+
+    @property
+    def played(self) -> bool:
+        """Whether the match has been played or not"""
+        return self.score1 != None or self.score2 != None
+
+    def pov_score(self, team: Team) -> Score:
+        """The result, from the POV of the given team"""
+        if team.id == self.team1_id:
+            return Score(home=self.score1, away=self.score2)
+        elif team.id == self.team2_id:
+            return Score(home=self.score2, away=self.score1)
+        else:
+            raise Exception("Not a valid team to view match as")
+
+    def opponent_of(self, team: Team) -> Team:
+        """The opponent of the given team"""
+        if team.id == self.team1_id:
+            return self.team2
+        elif team.id == self.team2_id:
+            return self.team1
+        else:
+            raise Exception("Not a valid team to view match as")
 
 
 # Create all the tables based on these models

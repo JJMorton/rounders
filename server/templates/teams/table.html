@@ -1,0 +1,65 @@
+<!--
+INPUTS:
+- teams: DataFrame with columns
+  'id'
+  'name'
+  'match_count'
+  'points'
+  'wins'
+  'draws'
+  'losses'
+  'scored'
+  'conceded'
+-->
+
+<figure>
+    <table>
+        <tr>
+            <th scope="column" class="left">Name</th>
+            <td class="colgap"></td>
+            {% if detailed %}
+                <th scope="column" class="right" title="Rounders Scored">R+</th>
+                <th scope="column" class="right" title="Rounders Conceded">R-</th>
+                <th scope="column" class="right" title="Rounders Difference">RD</th>
+            {% else %}
+                <th scope="column" class="right" title="Played">P</th>
+                <th scope="column" class="right" title="Wins">W</th>
+                <th scope="column" class="right" title="Losses">L</th>
+                <th scope="column" class="right" title="Draws">D</th>
+            {% endif %}
+            <td class="colgap"></td>
+            <th scope="column" class="right" title="Points">PTS</th>
+            {% if current_user.is_authenticated %}
+                <th scope="column">Action</th>
+            {% endif %}
+        </tr>
+        {% for _, row in teams.iterrows() %}
+            <tr>
+                <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
+    	        <td class="colgap"></td>
+                {% if detailed %}
+                    <td class="right">{{ row['scored'] }}</td>
+                    <td class="right">{{ row['conceded'] }}</td>
+                    <td class="right">{{ row['difference'] }}</td>
+                {% else %}
+                    <td class="right">{{ row['match_count'] or 0 }}</td>
+                    <td class="right">{{ row['wins'] }}</td>
+                    <td class="right">{{ row['losses'] }}</td>
+                    <td class="right">{{ row['draws'] }}</td>
+                {% endif %}
+                <td class="colgap"></td>
+                <td class="right">{{ row['points'] }}</td>
+                {% if current_user.is_authenticated %}
+                    <td class="center">
+                        <button class="small-button" title="Remove" onclick="confirmDialog('Remove {{ row['name'] }}?', '/teams/{{ row['id'] }}?next={{ request.url }}', 'DELETE')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <a href="/teams/{{ row['id'] }}/edit?next={{ request.url }}">
+                            <button class="small-button" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+                        </a>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</figure>

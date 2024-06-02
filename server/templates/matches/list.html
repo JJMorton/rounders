@@ -1,15 +1,30 @@
+<!--
+INPUTS:
+- matches: DataFrame with columns
+  'date' (timestamp of match)
+  'week' (timestamp of week start)
+  'id'
+  'name1'
+  'name2'
+  'teamid1'
+  'teamid2'
+  'score1'
+  'score2'
+  'played'
+-->
+
 <figure>
     <ul class="matches">
         {% for _, match in matches.iterrows() %}
             <li>
                 <div class="match">
                     <div class="datetime">
-                        <span class="date">{{ format_date(match['date']) }}</span>
-                        <span class="time">{{ format_time(match['date']) }}</span>
+                        <span class="date">{{ match['date'] }}</span>
+                        <span class="time">{{ match['time'] }}</span>
                     </div>
                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
                     <span class="details">
-                        {% if match['score1'] != '--' or match['score2'] != '--' %}
+                        {% if match['played'] %}
                             <span class="score">{{ match['score1'] }}</span>
                             <span class="versus">:</span>
                             <span class="score">{{ match['score2'] }}</span>
@@ -21,7 +36,7 @@
                 </div>
                 {% if current_user.is_authenticated %}
                     <div class="options">
-                        <div class="button-label-container" onclick="confirmDialog('Remove this match?', '/matches/{{ match['id'] }}/remove?next={{ request.url }}')">
+                        <div class="button-label-container" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}?next={{ request.url }}', 'DELETE')">
                             <button name="remove-match" class="small-button"><i class="fa-solid fa-trash"></i></button>
                             <label for="remove-match">Remove</label>
                         </div>

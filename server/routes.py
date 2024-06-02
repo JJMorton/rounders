@@ -3,8 +3,7 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
-from datetime import UTC, datetime, timedelta
-from typing import Optional
+from datetime import datetime, timedelta
 from dateutil import parser
 from flask import flash, redirect, render_template, request
 from flask_login import login_required
@@ -15,8 +14,8 @@ from time import perf_counter
 
 from .models import Team, Player, Match
 from . import app
-from . import config
 from . import db
+from . import formatting as fmt
 
 
 class Timer:
@@ -30,38 +29,30 @@ class Timer:
         return perf_counter() - self.start_time
 
 
-def basic_sanitisation(s: str) -> str:
-    # Very basic sanitisation, just to prevent mistakes.
-    # Doesn't need to be elaborate, as long as I'm aware of where
-    # the string is being used.
-    forbid_chars = ['\\', '\'', '"', ';', '<', '>']
-    return ''.join(ch for ch in s if not ch in forbid_chars)
-
-
 @app.route('/')
 def home():
     timer = Timer()
 
     now = datetime.now()
     today = datetime(year=now.year, month=now.month, day=now.day)
-    weekstart = (today - timedelta(days=today.weekday())).timestamp()
-    weekend = (today + timedelta(days=7 - today.weekday())).timestamp()
+    weekday_start_sat = (today.weekday() + 2) % 7
+    weekstart = (today - timedelta(days=weekday_start_sat)).timestamp()
+    weekend = (today + timedelta(days=7 - weekday_start_sat)).timestamp()
     matches = db.session.scalars(
         db
         .select(Match)
         .filter(and_(Match.play_date >= weekstart, Match.play_date < weekend))
     ).all()
 
-    # Create dataframe, sort by newest first
     matches_df = pd.DataFrame(dict(
-        date    = [m.play_date for m in matches],
+        date    = [fmt.AsDate(m.play_date) for m in matches],
         id      = [m.id for m in matches],
-        name1   = [m.team1.name for m in matches],
-        name2   = [m.team2.name for m in matches],
+        name1   = [fmt.AsTeamName(m.team1) for m in matches],
+        name2   = [fmt.AsTeamName(m.team2) for m in matches],
         teamid1 = [m.team1.id for m in matches],
         teamid2 = [m.team2.id for m in matches],
-        score1  = [m.score1 if m.score1 != None else '--' for m in matches],
-        score2  = [m.score2 if m.score2 != None else '--' for m in matches],
+        score1  = [fmt.AsScore(m.score1) for m in matches],
+        score2  = [fmt.AsScore(m.score2) for m in matches],
     )).sort_values('date')
 
     return render_template(
@@ -74,9 +65,9 @@ def home():
 
 @app.route('/teams/')
 def route_teams():
-    timer = Timer()
+    """Get a list of all teams"""
 
-    # Get a list of all teams
+    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -94,158 +85,76 @@ def route_teams():
         .order_by(Team.id)
     ).all()
 
-    # Fetch all matches played
-    matches1 = [
-        team.matches1.where(or_(Match.score1 != None, Match.score2 != None)).all()
-        for team in teams
-    ]
-    matches2 = [
-        team.matches2.where(or_(Match.score1 != None, Match.score2 != None)).all()
+    # Fetch all matches played by each team
+    matches = [
+        [
+            match for match in db.session.scalars(
+                db.select(Match).where(or_(Match.team1_id == team.id, Match.team2_id == team.id))
+            ).all()
+            if match.played
+        ]
         for team in teams
     ]
 
     # Compute no. of plays, wins, losses, etc.
-    # Need to account for the fact that a DNF loses to zero, so
-    # treat as -1.
-
-    # Function `comp` returns True if score `s1` wins over score `s2`
-    comp = lambda s1, s2: (-1 if s1 is None else s1) > (-1 if s2 is None else s2)
-    played = [len(m1) + len(m2) for m1, m2 in zip(matches1, matches2)]
+    played = [len(m) for m in matches]
     wins = [
-        len([m for m in m1 if comp(m.score1, m.score2)])
-        + len([m for m in m2 if comp(m.score2, m.score1)])
-        for m1, m2 in zip(matches1, matches2)
+        len([m for m in ms if m.winner and m.winner.id == team.id])
+        for ms, team in zip(matches, teams)
     ]
-    losses = [
-        len([m for m in m1 if comp(m.score2, m.score1)])
-        + len([m for m in m2 if comp(m.score1, m.score2)])
-        for m1, m2 in zip(matches1, matches2)
+    draws = [
+        len([m for m in ms if m.winner is None])
+        for ms in matches
     ]
-    draws = [p - w - l for p, w, l in zip(played, wins, losses)]
+    losses = [p - w - d for p, w, d in zip(played, wins, draws)]
     points = [2 * w + d for w, d in zip(wins, draws)]
+
+    # Total number of rounders scored and conceded
+    scored = [
+        sum(m.pov_score(team).home or 0 for m in ms)
+        for ms, team in zip(matches, teams)
+    ]
+    conceded = [
+        sum(m.pov_score(team).away or 0 for m in ms)
+        for ms, team in zip(matches, teams)
+    ]
 
     # Create table of teams, total scores and play count, sorting by score
     teams_df = pd.DataFrame(dict(
         id          = [t.id for t in teams],
-        name        = [t.name for t in teams],
+        name        = [fmt.AsTeamName(t) for t in teams],
         match_count = played,
         points      = points,
         wins        = wins,
         draws       = draws,
         losses      = losses,
-    )).sort_values('points', ascending=False)
+        scored      = [ fmt.AsScore(s / p if p else 0) for s, p in zip(scored, played) ],
+        conceded    = [ fmt.AsScore(c / p if p else 0) for c, p in zip(conceded, played) ],
+        difference  = [ fmt.AsScore((s - c) / p if p else 0) for s, c, p in zip(scored, conceded, played) ],
+    )).sort_values('difference', ascending=False).sort_values('points', ascending=False)
+
+    sortby = request.args.get('sortby')
+    if sortby in teams_df:
+        teams_df = teams_df.sort_values(sortby, ascending=sortby=='name')
+
+    # Render only the table if the request is from htmx
+    template = 'teams/table.html' if request.headers.get('hx-request') else 'teams/index.html'
 
     return render_template(
-        'teams/index.html',
-        title = f'Standings of {year}',
-        teams = teams_df,
-        year  = year,
-        years = years,
-        millis=timer.elapsed_ms,
+        template,
+        title    = f'Team Standings',
+        teams    = teams_df,
+        year     = year,
+        detailed = 'detailed' in request.args,
+        years    = years,
+        millis   = timer.elapsed_ms,
     )
 
 
-@app.route('/teams/<int:id>/')
-def route_team(id: int):
-    timer = Timer()
-
-    team = db.get_or_404(Team, int(id))
-
-    # Get (score1, score2) from matches where this was team1
-    q1 = team.matches1.subquery()
-    select1 = db.select(
-        Team.id,
-        Team.name,
-        q1.c.id,
-        q1.c.play_date,
-        q1.c.score1,
-        q1.c.score2
-    ).join(Team, Team.id == q1.c.team2_id)
-
-    # Get (score2, score1) from matches where this was team2
-    q2 = team.matches2.subquery()
-    select2 = db.select(
-        Team.id,
-        Team.name,
-        q2.c.id,
-        q2.c.play_date,
-        q2.c.score2,
-        q2.c.score1
-    ).join(Team, Team.id == q2.c.team1_id)
-
-    matches = (
-        list(db.session.execute(select1).fetchall())
-        + list(db.session.execute(select2).fetchall())
-    )
-
-    # Sort by date, put unscheduled matches at the top (newest)
-    matches_df = pd.DataFrame(dict(
-        date    = [m.play_date for m in matches],
-        id      = [m[2] for m in matches],
-        name1   = [team.name] * len(matches),
-        name2   = [m.name for m in matches],
-        teamid1 = [team.id] * len(matches),
-        teamid2 = [m[0] for m in matches],
-        score1  = [m[4] if m[4] != None else '--' for m in matches],
-        score2  = [m[5] if m[5] != None else '--' for m in matches],
-        played  = [m[4] != None or m[5] != None for m in matches],
-    )).sort_values('date', ascending=False)
-
-    players_df = pd.DataFrame(dict(
-        name_first = [p.name_first for p in team.players],
-        name_last  = [p.name_last for p in team.players],
-    ))
-
-    return render_template(
-        'teams/team.html',
-        title   = f'Team "{team.name}"',
-        team    = team,
-        matches = matches_df,
-        players = players_df,
-        millis=timer.elapsed_ms,
-    )
-
-
-@app.route('/teams/create', methods=["GET"])
+@app.route('/teams/', methods=["POST"])
 @login_required
-def route_create_team():
-    timer = Timer()
-
-    # Get a list of available years
-    years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
-    if not years: years.append(datetime.now().year)
-
-    # Use the year specified in the query parameters,
-    # otherwise use the latest available year
-    year: int = request.args.get('year', default=years[-1], type=int)
-
-    # Fetch the players
-    players = db.session.scalars(
-        db
-        .select(Player)
-        .order_by(Player.name_last)
-    ).all()
-
-    # Create table of teams for the form options
-    players_df = pd.DataFrame(dict(
-        id         = [p.id for p in players],
-        name_first = [p.name_first for p in players],
-        name_last = [p.name_last for p in players],
-    )).sort_values('name_last')
-
-    return render_template(
-        'teams/create.html',
-        title   = f"New Team ({year})",
-        players = players_df,
-        year    = year,
-        next    = request.args.get('next', default='/teams/create'),
-        millis  = timer.elapsed_ms,
-    )
-
-
-@app.route('/teams/create', methods=["POST"])
-@login_required
-def route_create_team_post():
+def route_teams_post():
+    """Create a team"""
 
     redirect_url = request.args.get("next", default=f'/teams', type=str)
 
@@ -259,7 +168,7 @@ def route_create_team_post():
     # Doesn't need to be elaborate, as long as I'm aware of where
     # the name is being used.
     if name:
-        name = basic_sanitisation(name)
+        name = fmt.basic_sanitisation(name)
     else:
         flash("Invalid team name")
         return redirect(redirect_url)
@@ -279,8 +188,8 @@ def route_create_team_post():
     players = [
         Player(
             team_id=team_id,
-            name_first=basic_sanitisation(first),
-            name_last=basic_sanitisation(last),
+            name_first=fmt.basic_sanitisation(first),
+            name_last=fmt.basic_sanitisation(last),
         ) # type: ignore
         for first, last in zip(first_names, last_names)
     ]
@@ -297,34 +206,73 @@ def route_create_team_post():
     return redirect(redirect_url)
 
 
-@app.route('/teams/<int:id>/edit', methods=["GET"])
+@app.route('/teams/create/', methods=["GET"])
 @login_required
-def route_edit_team(id):
+def route_teams_postform():
+    """Get the form to create a team"""
+
+    timer = Timer()
+
+    # Get a list of available years
+    years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
+    if not years: years.append(datetime.now().year)
+
+    # Use the year specified in the query parameters,
+    # otherwise use the latest available year
+    year: int = request.args.get('year', default=years[-1], type=int)
+
+    return render_template(
+        'teams/create.html',
+        title   = f"New Team ({year})",
+        year    = year,
+        next    = request.args.get('next', default=f'/teams?year={year}'),
+        millis  = timer.elapsed_ms,
+    )
+
+
+@app.route('/teams/<int:id>/')
+def route_team(id: int):
+    """Get a single team"""
+
     timer = Timer()
 
     team = db.get_or_404(Team, int(id))
 
-    # Create table of teams for the form options
+    matches: list[Match] = db.session.scalars(
+        db.select(Match).where(or_(Match.team1_id == team.id, Match.team2_id == team.id))
+    ).all() # type: ignore
+
+    matches_df = pd.DataFrame(dict(
+        date    = [fmt.AsDate(m.play_date) for m in matches],
+        id      = [m.id for m in matches],
+        name1   = [fmt.AsTeamName(team)] * len(matches),
+        name2   = [fmt.AsTeamName(m.opponent_of(team)) for m in matches],
+        teamid1 = [team.id] * len(matches),
+        teamid2 = [m.opponent_of(team).id for m in matches],
+        score1  = [fmt.AsScore(m.pov_score(team).home) for m in matches],
+        score2  = [fmt.AsScore(m.pov_score(team).away) for m in matches],
+        played  = [m.played for m in matches],
+    )).sort_values('date')
+
     players_df = pd.DataFrame(dict(
-        id         = [p.id for p in team.players],
         name_first = [p.name_first for p in team.players],
-        name_last = [p.name_last for p in team.players],
-    )).sort_values('name_last')
+        name_last  = [p.name_last for p in team.players],
+    ))
 
     return render_template(
-        'teams/edit.html',
-        title      = f'Edit Team "{team.name}"',
-        id         = team.id,
-        name       = team.name,
-        players    = players_df,
-        next       = request.args.get('next', default='/teams/create', type=str),
-        millis     = timer.elapsed_ms,
+        'teams/team.html',
+        title   = f'Team "{team.name}"',
+        team    = team,
+        matches = matches_df,
+        players = players_df,
+        millis=timer.elapsed_ms,
     )
 
 
-@app.route('/teams/<int:id>/edit', methods=["POST"])
+@app.route('/teams/<int:id>/', methods=["PATCH"])
 @login_required
-def route_edit_team_post(id):
+def route_team_patch(id):
+    """Edit a team"""
 
     team = db.get_or_404(Team, int(id))
     redirect_url = request.args.get("next", default=f'/teams?year={team.year}', type=str)
@@ -338,8 +286,8 @@ def route_edit_team_post(id):
     players = [
         Player(
             team_id=team.id,
-            name_first=basic_sanitisation(first),
-            name_last=basic_sanitisation(last),
+            name_first=fmt.basic_sanitisation(first),
+            name_last=fmt.basic_sanitisation(last),
         ) # type: ignore
         for first, last in zip(first_names, last_names)
     ]
@@ -356,9 +304,37 @@ def route_edit_team_post(id):
     return redirect(redirect_url)
 
 
-@app.route('/teams/<int:id>/remove', methods=["POST"])
+@app.route('/teams/<int:id>/edit', methods=["GET"])
 @login_required
-def route_remove_team_post(id):
+def route_team_patchform(id):
+    """Get the form to edit a team"""
+
+    timer = Timer()
+
+    team = db.get_or_404(Team, int(id))
+
+    # Create table of teams for the form options
+    players_df = pd.DataFrame(dict(
+        id         = [p.id for p in team.players],
+        name_first = [p.name_first for p in team.players],
+        name_last = [p.name_last for p in team.players],
+    )).sort_values('name_last')
+ 
+    return render_template(
+        'teams/edit.html',
+        title      = f'Edit Team "{team.name}"',
+        id         = team.id,
+        name       = fmt.AsTeamName(team),
+        players    = players_df,
+        next       = request.args.get('next', default=f'/teams/{id}', type=str),
+        millis     = timer.elapsed_ms,
+    )
+
+
+@app.route('/teams/<int:id>/', methods=["DELETE"])
+@login_required
+def route_team_delete(id):
+    """Delete a team"""
 
     team = db.get_or_404(Team, int(id))
     redirect_url = request.args.get("next", default=f'/teams', type=str)
@@ -395,6 +371,8 @@ def route_remove_team_post(id):
 
 @app.route('/matches/')
 def route_matches():
+    """Get all matches"""
+
     timer = Timer()
 
     # Get a list of available years
@@ -419,83 +397,46 @@ def route_matches():
     ).fetchall()
 
 
-    def timestamp_to_week_start(timestamp: Optional[int]) -> int:
-        if timestamp is None:
-            return -1
-        d = datetime.fromtimestamp(timestamp)
-        monday = d - timedelta(days = d.weekday())
-        return int(datetime(monday.year, monday.month, monday.day, tzinfo=UTC).timestamp())
-
-
     # Create dataframe, sort by newest first
     matches_df = pd.DataFrame(dict(
-        date    = [m[0].play_date for m in matches],
-        week    = [
-            timestamp_to_week_start(m[0].play_date)
-            for m in matches
-        ],
+        week    = [fmt.AsWeekOf(m[0].play_date) for m in matches],
+        date    = [fmt.AsDate(m[0].play_date) for m in matches],
+        time    = [fmt.AsTime(m[0].play_date) for m in matches],
         id      = [m[0].id for m in matches],
-        name1   = [m[1].name for m in matches],
-        name2   = [m[2].name for m in matches],
+        name1   = [fmt.AsTeamName(m[1]) for m in matches],
+        name2   = [fmt.AsTeamName(m[2]) for m in matches],
         teamid1 = [m[1].id for m in matches],
         teamid2 = [m[2].id for m in matches],
-        score1  = [m[0].score1 if m[0].score1 != None else '--' for m in matches],
-        score2  = [m[0].score2 if m[0].score2 != None else '--' for m in matches],
-        played  = [m[0].score1 != None or m[0].score2 != None for m in matches],
-    )).sort_values('date', ascending=False, na_position='last')
+        winner  = [fmt.AsTeamName(m[0].winner) for m in matches],
+        score1  = [fmt.AsScore(m[0].score1) for m in matches],
+        score2  = [fmt.AsScore(m[0].score2) for m in matches],
+        played  = [m[0].played for m in matches],
+    )).sort_values('date')
+
+    groupby = request.args.get('groupby')
+    if not groupby in matches_df:
+        groupby = 'week'
+
+    # Render only the list if the request is from htmx
+    template = 'matches/list_grouped.html' if request.headers.get('hx-request') else 'matches/index.html'
 
     return render_template(
-        'matches/index.html',
-        title   = f'Matches of {year}',
+        template,
+        title   = f'Matches',
         matches = matches_df,
+        groupby = groupby,
         years   = years,
         year    = year,
         millis  = timer.elapsed_ms,
     )
 
 
+@app.route('/matches/', methods=["POST"])
 @login_required
-@app.route('/matches/create', methods=["GET"])
-def route_create_match():
-    timer = Timer()
+def route_matches_post():
+    """Create a match"""
 
-    # Get a list of available years
-    years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
-    if not years: years.append(datetime.now().year)
-
-    # Use the year specified in the query parameters,
-    # otherwise use the latest available year
-    year: int = request.args.get('year', default=years[-1], type=int)
-
-    # Fetch the teams
-    teams = db.session.scalars(
-        db
-        .select(Team)
-        .where(Team.year == year)
-        .order_by(Team.id)
-    ).all()
-
-    # Create table of teams for the form options
-    teams_df = pd.DataFrame(dict(
-        id          = [t.id for t in teams],
-        name        = [t.name for t in teams],
-    )).sort_values('name')
-
-    return render_template(
-        'matches/create.html',
-        title = f"New Match ({year})",
-        teams = teams_df,
-        year  = year,
-        next  = request.args.get('next', default='/matches/create'),
-        millis=timer.elapsed_ms,
-    )
-
-
-@app.route('/matches/create', methods=["POST"])
-@login_required
-def route_create_match_post():
-
-    redirect_url = request.args.get("next", default=f'/matches/create', type=str)
+    redirect_url = request.args.get('next', default=f'/matches/create', type=str)
 
     team1_id = request.form.get("team1")
     team2_id = request.form.get("team2")
@@ -539,31 +480,50 @@ def route_create_match_post():
     return redirect(redirect_url)
 
 
+
+@app.route('/matches/create/', methods=["GET"])
 @login_required
-@app.route('/matches/<int:id>/edit', methods=["GET"])
-def route_edit_match(id):
+def route_matches_postform():
+    """Get the form to create a match"""
+
     timer = Timer()
 
-    match = db.get_or_404(Match, int(id))
+    # Get a list of available years
+    years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
+    if not years: years.append(datetime.now().year)
+
+    # Use the year specified in the query parameters,
+    # otherwise use the latest available year
+    year: int = request.args.get('year', default=years[-1], type=int)
+
+    # Fetch the teams
+    teams = db.session.scalars(
+        db
+        .select(Team)
+        .where(Team.year == year)
+        .order_by(Team.id)
+    ).all()
+
+    # Create table of teams for the form options
+    teams_df = pd.DataFrame(dict(
+        id          = [t.id for t in teams],
+        name        = [fmt.AsTeamName(t) for t in teams],
+    )).sort_values('name')
 
     return render_template(
-        'matches/edit.html',
-        title     = "Edit Match",
-        id        = match.id,
-        team1     = match.team1.name,
-        team2     = match.team2.name,
-        timestamp = match.play_date,
-        score1    = match.score1,
-        score2    = match.score2,
-        year      = match.team1.year,
-        next      = request.args.get('next', default='/matches/create'),
-        millis    = timer.elapsed_ms,
+        'matches/create.html',
+        title = f"New Match ({year})",
+        teams = teams_df,
+        year  = year,
+        next  = request.args.get('next', default='/matches/create'),
+        millis=timer.elapsed_ms,
     )
 
 
-@app.route('/matches/<int:id>/edit', methods=["POST"])
+@app.route('/matches/<int:id>/', methods=["PATCH"])
 @login_required
-def route_edit_match_post(id):
+def route_match_patch(id):
+    """Edit a match"""
 
     redirect_url = request.args.get("next", default=f'/matches', type=str)
 
@@ -585,9 +545,35 @@ def route_edit_match_post(id):
     return redirect(redirect_url)
 
 
-@app.route('/matches/<int:id>/remove', methods=["POST"])
 @login_required
-def route_remove_match_post(id):
+@app.route('/matches/<int:id>/edit/', methods=["GET"])
+def route_match_patchform(id):
+    """Get the form to edit a match"""
+
+    timer = Timer()
+
+    match = db.get_or_404(Match, int(id))
+
+    return render_template(
+        'matches/edit.html',
+        title     = "Edit Match",
+        id        = match.id,
+        team1     = fmt.AsTeamName(match.team1),
+        team2     = fmt.AsTeamName(match.team2),
+        date      = fmt.AsDateInput(match.play_date),
+        time      = fmt.AsTimeInput(match.play_date),
+        score1    = match.score1,
+        score2    = match.score2,
+        year      = match.team1.year,
+        next      = request.args.get('next', default='/matches/create'),
+        millis    = timer.elapsed_ms,
+    )
+
+
+@app.route('/matches/<int:id>/', methods=["DELETE"])
+@login_required
+def route_match_delete(id):
+    """Delete a match"""
 
     redirect_url = request.args.get("next", default=f'/matches', type=str)
 

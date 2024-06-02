@@ -4,54 +4,41 @@
 
 {% if current_user.is_authenticated %}
 
-<div id="button-create-match" class="button-label-container">
-    <a href="/matches/create?year={{ year }}&next={{ request.url }}">
-        <button name="create-match" class="large-button"><i class="fa-solid fa-plus"></i></button>
-        <label for="create-match">Create Match</label>
-    </a>
-</div>
+<section class="filters">
+    <div id="button-create-match" class="button-label-container">
+        <a href="/matches/create?year={{ year }}&next={{ request.url }}">
+            <button name="create-match" class="large-button"><i class="fa-solid fa-plus"></i></button>
+            <label for="create-match">Create Match</label>
+        </a>
+    </div>
+</section>
 
 {% endif %}
-
-{% with matches=matches[matches['played']] %}
-    {% if matches|length > 0 %}
-    <section>
-        <h2>Results</h2>
-        {% for week, matches in matches.groupby('week', sort=False) %}
-            {% if week >= 0 %}
-                <p class="date-group">Week of {{ format_date(week) }}</p>
-            {% else %}
-                <p class="date-group">Date TBC</p>
-            {% endif %}
-        	{% include 'partials/match_table.html' %}
-        {% endfor %}
-    </section>
-    {% endif %}
-{% endwith %}
-
-{% with matches=matches[matches['played'] == False] %}
-{% if matches|length > 0 %}
-    <section>
-        <h2>Scheduled</h2>
-        {% for week, matches in matches.groupby('week', sort=False) %}
-            {% if week >= 0 %}
-                <p class="date-group">Week of {{ format_date(week) }}</p>
-            {% else %}
-                <p class="date-group">Date TBC</p>
-            {% endif %}
-            {% include 'partials/match_table.html' %}
-        {% endfor %}
-    </section>
-{% endif %}
-{% endwith %}
 
 <section>
-    <ul class="page-nav">
-        <li class="title">View year</li>
-        {% for year in years %}
-            <li><a class="highlight" href="/matches?year={{ year }}">{{ year }}</a></td>
-        {% endfor %}
-    </ul>
+    <form class="filters" autocomplete="off" hx-get="{{ request.path }}" hx-target="#list-container" hx-trigger="change" hx-replace-url="true">
+        <div class="filter">
+            <label for="year">Year</label>
+            <select name="year" id="year">
+                {% for y in years %}
+                    <option value="{{ y }}" {{ 'selected' if y == year else '' }}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter">
+            <label for="groupby">Group By</label>
+            <select name="groupby" id="groupby">
+                {% for k, v in dict(week='Week', winner='Winning Team').items() %}
+                    <option value="{{ k }}" {{ 'selected' if k == request.args.get('groupby') else '' }}>{{ v }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <i class="htmx-indicator fa-solid fa-spinner"></i>
+    </form>
+</section>
+
+<section id="list-container">
+    {% include 'matches/list_grouped.html' %}
 </section>
 
 {% endblock %}

@@ -4,7 +4,7 @@
 
 <section>
 
-<form method="POST" action="/matches/{{ id }}/edit?next={{ next }}">
+<form method="PATCH" action="/matches/{{ id }}?next={{ next }}">
     <fieldset>
         <select disabled>
             <option value="">{{ team1 }}</option>
@@ -16,9 +16,9 @@
     <fieldset>
         <legend>Optional</legend>
         <label for="date">Date</label>
-        <input type="date" name="date" min="{{ year }}-01-01" max="{{ year }}-12-31" value="{{ prepare_for_date_input(timestamp) }}"/>
+        <input type="date" name="date" min="{{ year }}-01-01" max="{{ year }}-12-31" value="{{ date }}"/>
         <label for="time">Time</label>
-        <input type="time" name="time" value="{{ prepare_for_time_input(timestamp) }}"/>
+        <input type="time" name="time" value="{{ time }}"/>
         <label for="score1">Score 1</label>
         <input type="number" name="score1" min=0 step="0.5" value="{{ score1 }}"/>
         <label for="score2">Score 2</label>

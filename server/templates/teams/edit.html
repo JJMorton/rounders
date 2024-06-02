@@ -4,29 +4,17 @@
 
 <section>
 
-    <form method="POST" action="/teams/{{ id }}/edit?next={{ next }}">
+    <form method="PATCH" action="/teams/{{ id }}?next={{ next }}">
     	<input type="hidden" name="year" value="{{ year }}"/>
         <input type="text" value="{{ name }}" disabled>
         <fieldset>
             <legend>Players</legend>
 
-            <datalist id="list-name-first">
-                {% for _, player in players.iterrows() %}
-                    <option value="{{ player['name_first'] }}"></option>
-                {% endfor %}
-            </datalist>
-
-            <datalist id="list-name-last">
-                {% for _, player in players.iterrows() %}
-                    <option value="{{ player['name_last'] }}"></option>
-                {% endfor %}
-            </datalist>
-
             <table class="many-row-input">
                 <template>
                     <tr>
-                        <td><input required type="text" name="name-first" placeholder="First Name" list="list-name-first"/></td>
-                        <td><input required type="text" name="name-last" placeholder="Last Name" list="list-name-last"/></td>
+                        <td><input required type="text" name="name-first" placeholder="First Name"/></td>
+                        <td><input required type="text" name="name-last" placeholder="Last Name"/></td>
                         <td><button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 </template>
@@ -42,13 +30,11 @@
                 </thead>
                 <tbody>
                     {% for _, player in players.iterrows() %}
-                        {% if player['id'] in member_ids %}
-                            <tr>
-                                <td><input required type="text" name="name-first" placeholder="First Name" list="list-name-first" value="{{ player['name_first'] }}"/></td>
-                                <td><input required type="text" name="name-last" placeholder="Last Name" list="list-name-last" value="{{ player['name_last'] }}"/></td>
-                                <td><button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td><input required type="text" name="name-first" placeholder="First Name" value="{{ player['name_first'] }}"/></td>
+                            <td><input required type="text" name="name-last" placeholder="Last Name" value="{{ player['name_last'] }}"/></td>
+                            <td><button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

@@ -21,10 +21,14 @@ async function paginated(url) {
 	return results;
 }
 
-function confirmDialog(title, action) {
-	document.getElementById("confirm-title").textContent = title;
-	document.getElementById("confirm-form").setAttribute("action", action);
-	document.getElementById("dialog-confirm-action").showModal();
+function confirmDialog(title, action, method='POST') {
+	if (confirm(title)) {
+		const form = document.createElement('form');
+		form.method = method;
+		form.action = action;
+		document.body.appendChild(form);
+		form.submit();
+	}
 }
 
 function parentOfType(elt, tag) {
