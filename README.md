@@ -12,23 +12,27 @@ Requires Python >= **3.11**.
 3. Run with a WSGI server (e.g. gunicorn) or debug with `flask --app rounders:app run --debug`.
 
 ## Available endpoints
+
 - `GET` `/`: The homepage
 - `GET` `/rules`: Rules of the game
 
+
 - `GET` `/teams/`: Get a list of all teams
-- `GET` `/teams/create/`[^1]: Get the form to create a team
-- `GET` `/teams/<int:id>/`[^1]: Get a single team
-- `GET` `/teams/<int:id>/edit`[^1]: Get the form to edit a team
-- `POST` `/teams/`[^1]: Create a team
-- `PATCH` `/teams/<int:id>/`[^1]: Edit a team
-- `DELETE` `/teams/<int:id>/`[^1]: Delete a team
+- \*`GET` `/teams/create/`: Get the form to create a team
+- \*`GET` `/teams/<int:id>/`: Get a single team
+- \*`GET` `/teams/<int:id>/edit`: Get the form to edit a team
+- \*`POST` `/teams/`: Create a team
+- \*`PATCH` `/teams/<int:id>/`: Edit a team
+- \*`DELETE` `/teams/<int:id>/`: Delete a team
+
 
 - `GET` `/matches/`: Get all matches
-- `GET` `/matches/create/`[^1]: Get the form to create a match
-- `GET` `/matches/<int:id>/edit/`[^1]: Get the form to edit a match
-- `POST` `/matches/`[^1]: Create a match
-- `PATCH` `/matches/<int:id>/`[^1]: Edit a match
-- `DELETE` `/matches/<int:id>/`[^1]: Delete a match
+- \*`GET` `/matches/create/`: Get the form to create a match
+- \*`GET` `/matches/<int:id>/edit/`: Get the form to edit a match
+- \*`POST` `/matches/`: Create a match
+- \*`PATCH` `/matches/<int:id>/`: Edit a match
+- \*`DELETE` `/matches/<int:id>/`: Delete a match
 
-[^1]: Requires authentication as the administrator
+
+\* *Requires authentication as the administrator*
 
