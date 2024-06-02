@@ -25,9 +25,9 @@ INPUTS:
                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
                     <span class="details">
                         {% if match['played'] %}
-                            <span class="score">{{ match['score1'] }}</span>
+                            <span class="score {{ 'winner animate-pulse' if match['score1'] > match['score2'] else '' }}">{{ match['score1'] }}</span>
                             <span class="versus">:</span>
-                            <span class="score">{{ match['score2'] }}</span>
+                            <span class="score {{ 'winner animate-pulse' if match['score2'] > match['score1'] else '' }}">{{ match['score2'] }}</span>
                         {% else %}
                             vs.
                         {% endif %}

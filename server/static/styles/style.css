@@ -96,6 +96,50 @@ body {
 }
 
 
+/* Animations */
+
+@keyframes slide-right {
+	0% {
+		transform: translateX(-10px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateX(0px);
+		opacity: 1;
+	}
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes spin {
+	0% { rotate: 0deg; }
+	100% { rotate: 360deg; }
+}
+
+.animate-slide-right {
+	animation: 150ms ease-out 0s slide-right;
+	animation-fill-mode: backwards;
+}
+
+.animate-pulse {
+	animation: 300ms linear 0s pulse;
+}
+
+.animate-spin {
+	animation: 1s linear 0s infinite spin;
+}
+
+
 /* Nav. bar */
 
 header {
@@ -259,7 +303,6 @@ dialog.question > .content {
 /* Form elements */
 
 form {
-/*	max-width: 500px;*/
 	margin: 0 auto;
 }
 
@@ -268,6 +311,23 @@ input[type="password"] {
 	padding: 10px;
 	border: 1px solid var(--color-mid);
 	border-radius: var(--corner-radius);
+}
+
+input[type="checkbox"]:checked {
+	animation: 300ms linear 0s pulse;
+}
+
+input[type="checkbox"]:not(:hover) {
+	animation: 0s linear 0s pulse;
+}
+
+select:not(:disabled) {
+	background-color: var(--color-dim);
+}
+
+select {
+	border-radius: var(--corner-radius);
+	height: 2.5em;
 }
 
 fieldset {
@@ -485,12 +545,16 @@ ul.matches .details {
 
 ul.matches .score {
 	display: inline-block;
-	background-color: var(--color-accent-light);
 	flex: 1;
 	padding: 5px 0;
 	border-radius: var(--corner-radius);
+	border: 2px solid var(--color-accent-light);
 	white-space: nowrap;
 	font-weight: bold;
+}
+
+ul.matches .score.winner {
+	background-color: var(--color-accent-light);
 }
 
 ul.matches .versus {
@@ -605,11 +669,6 @@ form.login {
 
 .filter label {
 	font-weight: bold;
-}
-
-@keyframes spin {
-	0% { rotate: 0deg; }
-	100% { rotate: 360deg; }
 }
 
 .fa-spinner {

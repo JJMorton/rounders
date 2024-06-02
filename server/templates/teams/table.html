@@ -34,7 +34,7 @@ INPUTS:
             {% endif %}
         </tr>
         {% for _, row in teams.iterrows() %}
-            <tr>
+            <tr class="animate-slide-right" style="animation-delay: {{ loop.index * 30 }}ms">
                 <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
     	        <td class="colgap"></td>
                 {% if detailed %}
