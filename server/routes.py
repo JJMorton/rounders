@@ -269,7 +269,7 @@ def route_team(id: int):
     )
 
 
-@app.route('/teams/<int:id>/', methods=["PATCH"])
+@app.route('/teams/<int:id>/edit/', methods=["POST"])
 @login_required
 def route_team_patch(id):
     """Edit a team"""
@@ -331,7 +331,7 @@ def route_team_patchform(id):
     )
 
 
-@app.route('/teams/<int:id>/', methods=["DELETE"])
+@app.route('/teams/<int:id>/delete/', methods=["POST"])
 @login_required
 def route_team_delete(id):
     """Delete a team"""
@@ -520,7 +520,7 @@ def route_matches_postform():
     )
 
 
-@app.route('/matches/<int:id>/', methods=["PATCH"])
+@app.route('/matches/<int:id>/edit', methods=["POST"])
 @login_required
 def route_match_patch(id):
     """Edit a match"""
@@ -570,7 +570,7 @@ def route_match_patchform(id):
     )
 
 
-@app.route('/matches/<int:id>/', methods=["DELETE"])
+@app.route('/matches/<int:id>/delete/', methods=["POST"])
 @login_required
 def route_match_delete(id):
     """Delete a match"""

@@ -22,16 +22,16 @@ Requires Python >= **3.11**.
 - \*`GET` `/teams/<int:id>/`: Get a single team
 - \*`GET` `/teams/<int:id>/edit`: Get the form to edit a team
 - \*`POST` `/teams/`: Create a team
-- \*`PATCH` `/teams/<int:id>/`: Edit a team
-- \*`DELETE` `/teams/<int:id>/`: Delete a team
+- \*`POST` `/teams/<int:id>/edit/`: Edit a team
+- \*`POST` `/teams/<int:id>/delete/`: Delete a team
 
 
 - `GET` `/matches/`: Get all matches
 - \*`GET` `/matches/create/`: Get the form to create a match
 - \*`GET` `/matches/<int:id>/edit/`: Get the form to edit a match
 - \*`POST` `/matches/`: Create a match
-- \*`PATCH` `/matches/<int:id>/`: Edit a match
-- \*`DELETE` `/matches/<int:id>/`: Delete a match
+- \*`POST` `/matches/<int:id>/edit/`: Edit a match
+- \*`POST` `/matches/<int:id>/delete/`: Delete a match
 
 
 \* *Requires authentication as the administrator*

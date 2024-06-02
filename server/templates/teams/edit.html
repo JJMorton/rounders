@@ -4,7 +4,7 @@
 
 <section>
 
-    <form method="PATCH" action="/teams/{{ id }}?next={{ next }}">
+    <form method="POST" action="/teams/{{ id }}/edit?next={{ next }}">
     	<input type="hidden" name="year" value="{{ year }}"/>
         <input type="text" value="{{ name }}" disabled>
         <fieldset>

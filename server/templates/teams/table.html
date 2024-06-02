@@ -51,7 +51,7 @@ INPUTS:
                 <td class="right">{{ row['points'] }}</td>
                 {% if current_user.is_authenticated %}
                     <td class="center">
-                        <button class="small-button" title="Remove" onclick="confirmDialog('Remove {{ row['name'] }}?', '/teams/{{ row['id'] }}?next={{ request.url }}', 'DELETE')">
+                        <button class="small-button" title="Remove" onclick="confirmDialog('Remove {{ row['name'] }} and ALL associated matches?', '/teams/{{ row['id'] }}/delete?next={{ request.url }}')">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                         <a href="/teams/{{ row['id'] }}/edit?next={{ request.url }}">

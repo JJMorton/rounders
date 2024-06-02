@@ -36,7 +36,7 @@ INPUTS:
                 </div>
                 {% if current_user.is_authenticated %}
                     <div class="options">
-                        <div class="button-label-container" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}?next={{ request.url }}', 'DELETE')">
+                        <div class="button-label-container" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')">
                             <button name="remove-match" class="small-button"><i class="fa-solid fa-trash"></i></button>
                             <label for="remove-match">Remove</label>
                         </div>
