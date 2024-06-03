@@ -111,13 +111,16 @@ body {
 
 @keyframes pulse {
 	0% {
-		transform: scale(1);
+		transform: scale(1) rotate(0deg);
 	}
 	50% {
-		transform: scale(1.2);
+		transform: scale(1.3) rotate(4deg);
+	}
+	90% {
+		transform: scale(0.9);
 	}
 	100% {
-		transform: scale(1);
+		transform: scale(1) rotate(0deg);
 	}
 }
 
@@ -132,7 +135,7 @@ body {
 }
 
 .animate-pulse {
-	animation: 300ms linear 0s pulse;
+	animation: 200ms linear 0s pulse;
 }
 
 .animate-spin {
@@ -314,20 +317,19 @@ input[type="password"] {
 }
 
 input[type="checkbox"]:checked {
-	animation: 300ms linear 0s pulse;
+	animation: 200ms linear 0s pulse;
 }
 
 input[type="checkbox"]:not(:hover) {
 	animation: 0s linear 0s pulse;
 }
 
-select:not(:disabled) {
-	background-color: var(--color-dim);
-}
-
 select {
-	border-radius: var(--corner-radius);
 	height: 2.5em;
+	border-radius: var(--corner-radius);
+	background-color: #fff;
+	border: 1px solid var(--color-mid);
+	padding: 0 10px;
 }
 
 fieldset {
@@ -344,12 +346,6 @@ fieldset {
 legend {
 	color: var(--color-mid);
 	font-size: 80%;
-}
-
-select {
-	padding: 5px;
-	border: 1px solid var(--color-mid);
-	border-radius: var(--corner-radius);
 }
 
 .button-label-container {
@@ -643,28 +639,17 @@ form.login {
 
 /* Page filters */
 
-.filters {
-	display: flex;
-	flex-direction: row;
-	gap: var(--content-padding);
-	margin-bottom: var(--content-padding);
-	align-items: center;
-}
-
 .filter {
-	display: flex;
+	display: inline-flex;
 	flex-direction: column;
 	justify-content: center;
 	gap: 4px;
+	margin-bottom: var(--content-padding);
+	vertical-align: middle;
 }
 
 .filter:not(:last-of-type) {
-	padding-right: var(--content-padding);
-	border-right: 1px solid var(--color-dim);
-}
-
-.filter > * {
-	display: block;
+	margin-right: var(--content-padding);
 }
 
 .filter label {
