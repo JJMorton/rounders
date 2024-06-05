@@ -63,12 +63,16 @@ class Match(db.Model):
     __tablename__ = "matches"
 
     # Columns
-    id:        Mapped[int]   = mapped_column(primary_key=True, nullable=False)
-    team1_id:  Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
-    team2_id:  Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
-    score1:    Mapped[Optional[float]] = mapped_column(nullable=True)
-    score2:    Mapped[Optional[float]] = mapped_column(nullable=True)
-    play_date: Mapped[Optional[int]]   = mapped_column(nullable=True)
+    id:         Mapped[int]   = mapped_column(primary_key=True, nullable=False)
+    team1_id:   Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
+    team2_id:   Mapped[int]   = mapped_column(ForeignKey('teams.id'), nullable=False)
+    score1:     Mapped[Optional[float]] = mapped_column(nullable=True)
+    score2:     Mapped[Optional[float]] = mapped_column(nullable=True)
+    score1_in1: Mapped[Optional[float]] = mapped_column(nullable=True)
+    """Points scored by team 1 in the first inning, may be null even if score1 is not null"""
+    score2_in1: Mapped[Optional[float]] = mapped_column(nullable=True)
+    """Points scored by team 2 in the first inning, may be null even if score2 is not null"""
+    play_date:  Mapped[Optional[int]]   = mapped_column(nullable=True)
     """Unix epoch of the start of the date played on"""
 
     # Relationships
@@ -76,6 +80,24 @@ class Match(db.Model):
     """The first team of this match"""
     team2: Mapped["Team"] = relationship(foreign_keys="Match.team2_id", back_populates="matches2")
     """The second team of this match"""
+
+    @property
+    def score1_in2(self) -> Optional[float]:
+        """Points scored by team 1 in the second inning, may be null even if score1 is not null"""
+        return (
+            self.score1 - self.score1_in1
+            if not (self.score1 is None or self.score1_in1 is None)
+            else None
+        )
+
+    @property
+    def score2_in2(self) -> Optional[float]:
+        """Points scored by team 2 in the second inning, may be null even if score2 is not null"""
+        return (
+            self.score2 - self.score2_in1
+            if not (self.score2 is None or self.score2_in1 is None)
+            else None
+        )
 
     @property
     def winner(self) -> Optional[Team]:
@@ -108,6 +130,17 @@ class Match(db.Model):
         else:
             raise Exception("Not a valid team to view match as")
 
+    @classmethod
+    def score_from_innings(cls, inning1: Optional[float], inning2: Optional[float]) -> Optional[float]:
+            """Compute total score, given score (if any) achieved during each inning"""
+
+            # Total score is NULL if both innings are NULL.
+            # If either inning is NOT NULL, the total score is NOT NULL.
+            return (
+                None
+                if (inning1 is None and inning2 is None)
+                else (inning1 or 0) + (inning2 or 0)
+            )
 
 # Create all the tables based on these models
 with app.app_context():

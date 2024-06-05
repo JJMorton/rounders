@@ -26,10 +26,20 @@
         <input type="date" name="date" min="{{ year }}-01-01" max="{{ year }}-12-31"/>
         <label for="time">Time</label>
         <input type="time" name="time" value="18:00"/>
-        <label for="score1">Score 1</label>
-        <input type="number" name="score1" min=0 step="0.5"/>
-        <label for="score2">Score 2</label>
-        <input type="number" name="score2" min=0 step="0.5"/>
+        <fieldset>
+            <legend>Inning 1</legend>
+            <label for="score1-in1">Team 1</label>
+            <input type="number" name="score1_in1" id="score1-in1" min=0 step="0.5"/>
+            <label for="score2-in1">Team 2</label>
+            <input type="number" name="score2_in1" id="score2-in1" min=0 step="0.5"/>
+        </fieldset>
+        <fieldset>
+            <legend>Inning 2</legend>
+            <label for="score1-in2">Team 1</label>
+            <input type="number" name="score1_in2" id="score1-in2" min=0 step="0.5"/>
+            <label for="score2-in2">Team 2</label>
+            <input type="number" name="score2_in2" id="score2-in2" min=0 step="0.5"/>
+        </fieldset>
     </fieldset>
     <div>
     	<a href="{{ next }}">

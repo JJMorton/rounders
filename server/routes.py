@@ -438,8 +438,8 @@ def route_matches_post():
 
     redirect_url = request.args.get('next', default=f'/matches/create', type=str)
 
-    team1_id = request.form.get("team1")
-    team2_id = request.form.get("team2")
+    team1_id = request.form.get("team1", type=int)
+    team2_id = request.form.get("team2", type=int)
     if not team1_id or not team2_id:
         flash("Invalid team")
         return redirect(redirect_url)
@@ -458,14 +458,22 @@ def route_matches_post():
     time_str = request.form.get("time") or "00:00"
     date = int(parser.parse(f'{date_str}T{time_str}:00Z').timestamp()) if date_str else None
 
-    score1 = request.form.get("score1", default=None, type=float)
-    score2 = request.form.get("score2", default=None, type=float)
+    innings1 = (
+        request.form.get("score1_in1", default=None, type=float),
+        request.form.get("score1_in2", default=None, type=float),
+    )
+    innings2 = (
+        request.form.get("score2_in1", default=None, type=float),
+        request.form.get("score2_in2", default=None, type=float),
+    )
 
     match = Match(
         team1_id=team1_id,
         team2_id=team2_id,
-        score1=score1,
-        score2=score2,
+        score1=Match.score_from_innings(*innings1),
+        score2=Match.score_from_innings(*innings2),
+        score1_in1=innings1[0],
+        score2_in1=innings2[0],
         play_date=date
     ) # type: ignore
 
@@ -533,17 +541,24 @@ def route_match_patch(id):
     time_str = request.form.get("time") or "00:00"
     date = int(parser.parse(f'{date_str}T{time_str}:00Z').timestamp()) if date_str else None
 
-    score1 = request.form.get("score1", default=None, type=float)
-    score2 = request.form.get("score2", default=None, type=float)
+    innings1 = (
+        request.form.get("score1_in1", default=None, type=float),
+        request.form.get("score1_in2", default=None, type=float),
+    )
+    innings2 = (
+        request.form.get("score2_in1", default=None, type=float),
+        request.form.get("score2_in2", default=None, type=float),
+    )
 
     match.play_date = date
-    match.score1 = score1
-    match.score2 = score2
+    match.score1 = Match.score_from_innings(*innings1)
+    match.score2 = Match.score_from_innings(*innings2)
+    match.score1_in1 = innings1[0]
+    match.score2_in1 = innings2[0]
     db.session.commit()
 
     flash("Updated match")
     return redirect(redirect_url)
-
 
 @login_required
 @app.route('/matches/<int:id>/edit/', methods=["GET"])
@@ -556,17 +571,21 @@ def route_match_patchform(id):
 
     return render_template(
         'matches/edit.html',
-        title     = "Edit Match",
-        id        = match.id,
-        team1     = fmt.AsTeamName(match.team1),
-        team2     = fmt.AsTeamName(match.team2),
-        date      = fmt.AsDateInput(match.play_date),
-        time      = fmt.AsTimeInput(match.play_date),
-        score1    = match.score1,
-        score2    = match.score2,
-        year      = match.team1.year,
-        next      = request.args.get('next', default='/matches/create'),
-        millis    = timer.elapsed_ms,
+        title      = "Edit Match",
+        id         = match.id,
+        team1      = fmt.AsTeamName(match.team1),
+        team2      = fmt.AsTeamName(match.team2),
+        date       = fmt.AsDateInput(match.play_date),
+        time       = fmt.AsTimeInput(match.play_date),
+        # FIXME: For matches where the innings were not recorded
+        # separately, put the total score in inning 1.
+        score1_in1 = match.score1_in1 or match.score1,
+        score1_in2 = match.score1_in2,
+        score2_in1 = match.score2_in1 or match.score2,
+        score2_in2 = match.score2_in2,
+        year       = match.team1.year,
+        next       = request.args.get('next', default='/matches/create'),
+        millis     = timer.elapsed_ms,
     )
 
 
