@@ -137,7 +137,7 @@ body {
 }
 
 .animate-pulse {
-	animation: 200ms linear 0s pulse;
+	animation: 200ms linear 400ms pulse;
 }
 
 .animate-spin {
@@ -644,6 +644,10 @@ form.login {
 
 
 /* Page filters */
+
+.filters {
+	margin-bottom: var(--content-padding);
+}
 
 .filter {
 	display: inline-flex;
