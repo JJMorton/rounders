@@ -45,7 +45,8 @@ def home():
     ).all()
 
     matches_df = pd.DataFrame(dict(
-        date    = [fmt.AsDate(m.play_date) for m in matches],
+        date    = [fmt.AsDate(m.play_date, newest_first=False) for m in matches],
+        time    = [fmt.AsTime(m.play_date, newest_first=False) for m in matches],
         id      = [m.id for m in matches],
         name1   = [fmt.AsTeamName(m.team1) for m in matches],
         name2   = [fmt.AsTeamName(m.team2) for m in matches],
@@ -53,6 +54,7 @@ def home():
         teamid2 = [m.team2.id for m in matches],
         score1  = [fmt.AsScore(m.score1) for m in matches],
         score2  = [fmt.AsScore(m.score2) for m in matches],
+        played  = [m.played for m in matches],
     )).sort_values('date')
 
     return render_template(
@@ -407,7 +409,6 @@ def route_matches():
         name2   = [fmt.AsTeamName(m[2]) for m in matches],
         teamid1 = [m[1].id for m in matches],
         teamid2 = [m[2].id for m in matches],
-        winner  = [fmt.AsTeamName(m[0].winner) for m in matches],
         score1  = [fmt.AsScore(m[0].score1) for m in matches],
         score2  = [fmt.AsScore(m[0].score2) for m in matches],
         played  = [m[0].played for m in matches],
