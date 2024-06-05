@@ -411,6 +411,7 @@ def route_matches():
         teamid2 = [m[2].id for m in matches],
         score1  = [fmt.AsScore(m[0].score1) for m in matches],
         score2  = [fmt.AsScore(m[0].score2) for m in matches],
+        winner  = [fmt.AsTeamName(m[0].winner) for m in matches],
         played  = [m[0].played for m in matches],
     )).sort_values('date')
 
