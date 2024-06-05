@@ -399,9 +399,9 @@ def route_matches():
 
     # Create dataframe, sort by newest first
     matches_df = pd.DataFrame(dict(
-        week    = [fmt.AsWeekOf(m[0].play_date) for m in matches],
-        date    = [fmt.AsDate(m[0].play_date) for m in matches],
-        time    = [fmt.AsTime(m[0].play_date) for m in matches],
+        week    = [fmt.AsWeekOf(m[0].play_date, newest_first=m[0].played) for m in matches],
+        date    = [fmt.AsDate(m[0].play_date, newest_first=m[0].played) for m in matches],
+        time    = [fmt.AsTime(m[0].play_date, newest_first=m[0].played) for m in matches],
         id      = [m[0].id for m in matches],
         name1   = [fmt.AsTeamName(m[1]) for m in matches],
         name2   = [fmt.AsTeamName(m[2]) for m in matches],
