@@ -246,6 +246,7 @@ def route_team(id: int):
 
     matches_df = pd.DataFrame(dict(
         date    = [fmt.AsDate(m.play_date) for m in matches],
+        time    = [fmt.AsTime(m.play_date) for m in matches],
         id      = [m.id for m in matches],
         name1   = [fmt.AsTeamName(team)] * len(matches),
         name2   = [fmt.AsTeamName(m.opponent_of(team)) for m in matches],
