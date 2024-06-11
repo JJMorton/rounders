@@ -3,8 +3,11 @@
 :root {
 	--nav-height: 75px;
 	--mobile-nav-size: 50px;
-	--min-page-width: 400px;
-	--max-page-width: 100ch;
+	--min-page-width: 320px;
+	--max-page-width: 900px;
+
+	/* Size of clickable regions */
+	--finger-size: 40px;
 
     --corner-radius: 8px;
     --content-padding: 15px;
@@ -90,11 +93,18 @@ body {
 	min-width: var(--min-page-width);
 }
 
-.flex-row {
+.flex-row, .flex-responsive {
 	display: flex;
 	flex-direction: row;
-	justify-content: left;
 	align-items: center;
+	gap: var(--content-padding);
+}
+
+@media (width <= 600px) {
+	.flex-responsive {
+		flex-direction: column;
+		align-items: stretch;
+	}
 }
 
 
@@ -327,15 +337,87 @@ input[type="checkbox"]:not(:hover) {
 }
 
 select {
-	height: 2.5em;
-	border-radius: var(--corner-radius);
 	background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iNC45NSIgaGVpZ2h0PSIxMCIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIxLjQxIDQuNjcgMi40OCAzLjE4IDMuNTQgNC42NyAxLjQxIDQuNjciLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMy41NCA1LjMzIDIuNDggNi44MiAxLjQxIDUuMzMgMy41NCA1LjMzIi8+PC9zdmc+) no-repeat 95% 50%;
 	-moz-appearance: none; 
 	-webkit-appearance: none; 
 	appearance: none;
-	background-color: #fff;
+}
+
+select,
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="time"],
+input[type="date"] {
+	height: var(--finger-size);
+	border-radius: var(--corner-radius);
 	border: 1px solid var(--color-mid);
-	padding: 0 20px 0 10px;
+	background-color: #fff;
+	padding: 0 var(--content-padding);
+}
+
+select {
+	padding: 0 30px 0 var(--content-padding);
+}
+
+input.score-input {
+	font-weight: bold;
+	text-align: center;
+	width: max(4ch, calc(2 * var(--finger-size)));
+}
+
+.fancy-number-input {
+	display: flex;
+	flex-direction: row;
+}
+
+.fancy-number-input > input {
+	border-radius: 0;
+	padding: 0;
+}
+
+.fancy-number-input.big > input {
+	height: calc(2 * var(--finger-size));
+	font-size: 130%;
+}
+
+.fancy-number-input > input[type="number"] {
+	-webkit-appearance: textfield;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.fancy-number-input > input[type=number]::-webkit-inner-spin-button, 
+.fancy-number-input > input[type=number]::-webkit-outer-spin-button { 
+	-webkit-appearance: none;
+}
+
+.fancy-number-input > button {
+	line-height: var(--finger-size);
+	width: var(--finger-size);
+	text-align: center;
+	padding: 0;
+	border-radius: 0;
+	border: 1px solid var(--color-mid);
+	background-color: #fff;
+	font-size: 130%;
+}
+
+.fancy-number-input.big > button {
+	line-height: calc(2 * var(--finger-size));
+	width: calc(2 * var(--finger-size));
+}
+
+.fancy-number-input > button.fancy-number-dec {
+	border-top-left-radius: var(--corner-radius);
+	border-bottom-left-radius: var(--corner-radius);
+	border-right: none;
+}
+
+.fancy-number-input > button.fancy-number-inc {
+	border-top-right-radius: var(--corner-radius);
+	border-bottom-right-radius: var(--corner-radius);
+	border-left: none;
 }
 
 fieldset {
@@ -373,7 +455,6 @@ legend {
 
 button {
 	background-color: var(--color-accent-light);
-	box-shadow: var(--shadow);
 	outline: none;
 	border: none;
 	border-radius: var(--corner-radius);
@@ -382,29 +463,27 @@ button {
 	align-items: center;
 	justify-content: center;
 	gap: 5px;
-	padding: 6px;
+	padding: 8px;
 }
 
 button.large-button {
-	min-width: 2.5em;
-	height: 2.5em;
+	min-width: var(--finger-size);
+	height: var(--finger-size);
 	font-size: 90%;
+	padding: 0 var(--content-padding);
 }
 
-button.small-button {
-	min-width: 2em;
-	height: 2em;
-	padding: 3px;
-	border-radius: calc(var(--corner-radius) * 0.7);
-	font-size: 70%;
-}
-
-button.large-button.cancel {
+button.cancel {
 	background: none;
-	border: 2px solid var(--color-mid);
+	border: 1px solid var(--color-mid);
 }
 
-button.large-button:active {
+input:invalid,
+select:invalid {
+	border-color: red;
+}
+
+button:active {
 	transform: translate(1px, 1px);
 }
 
@@ -604,15 +683,11 @@ ul.matches .match:not(:last-child) {
 }
 
 ul.matches .options {
+	background-color: var(--color-dim);
 	border-bottom-left-radius: var(--corner-radius);
 	border-bottom-right-radius: var(--corner-radius);
-	border: 2px solid var(--color-dim);
 	padding: 5px;
 	text-align: center;
-	display: flex;
-	flex-direction: row;
-	gap: 10px;
-	align-items: center;
 }
 
 

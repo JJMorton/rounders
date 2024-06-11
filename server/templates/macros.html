@@ -1,0 +1,7 @@
+{% macro fancy_number_input(id, name, min, max, step, value='', class='') -%}
+    <div class="fancy-number-input big">
+        <button type="button" class="fancy-number-dec" for="{{ id }}">&minus;</button>
+        <input type="number" class="{{ class }}" name="{{ name }}" id="{{ id }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}"/>
+        <button type="button" class="fancy-number-inc" for="{{ id }}">&plus;</button>
+    </div>
+{%- endmacro %}

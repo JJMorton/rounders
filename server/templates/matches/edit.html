@@ -1,3 +1,5 @@
+{% import 'macros.html' as macros %}
+
 {% extends "base.html" %}
 
 {% block content %}
@@ -5,42 +7,45 @@
 <section>
 
 <form method="POST" action="/matches/{{ id }}/edit?next={{ next }}">
-    <fieldset>
-        <select disabled>
+
+    <fieldset class="flex-responsive">
+        <legend>Teams</legend>
+        <select id="select-team1" disabled>
             <option value="">{{ team1 }}</option>
         </select>
-        <select disabled>
+        <select id="select-team2" disabled>
             <option value="">{{ team2 }}</option>
         </select>
     </fieldset>
-    <fieldset>
-        <legend>Optional</legend>
-        <label for="date">Date</label>
+
+    <fieldset class="flex-responsive">
+        <legend>Schedule</legend>
         <input type="date" name="date" min="{{ year }}-01-01" max="{{ year }}-12-31" value="{{ date }}"/>
-        <label for="time">Time</label>
         <input type="time" name="time" value="{{ time }}"/>
-        <fieldset>
-            <legend>Inning 1</legend>
-            <label for="score1-in1">Team 1</label>
-            <input type="number" name="score1_in1" id="score1-in1" min=0 step="0.5" value="{{score1_in1}}"/>
-            <label for="score2-in1">Team 2</label>
-            <input type="number" name="score2_in1" id="score2-in1" min=0 step="0.5" value="{{score2_in1}}"/>
-        </fieldset>
-        <fieldset>
-            <legend>Inning 2</legend>
-            <label for="score1-in2">Team 1</label>
-            <input type="number" name="score1_in2" id="score1-in2" min=0 step="0.5" value="{{score1_in2}}"/>
-            <label for="score2-in2">Team 2</label>
-            <input type="number" name="score2_in2" id="score2-in2" min=0 step="0.5" value="{{score2_in2}}"/>
-        </fieldset>
     </fieldset>
-    <div>
-    	<a href="{{ next }}">
-            <button type="button" class="large-button cancel">Cancel</button>
-        </a>
+
+    <fieldset>
+        <legend>Inning 1</legend>
+        <label class="label-team1" for="score1-in1">Team 1</label>
+        {{ macros.fancy_number_input(id='score1-in1', name='score1_in1', min=0, max=99, step=0.5, value=score1_in1, class='score-input') }}
+        <label class="label-team2" for="score2-in1">Team 2</label>
+        {{ macros.fancy_number_input(id='score2-in1', name='score2_in1', min=0, max=99, step=0.5, value=score2_in1, class='score-input') }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Inning 2</legend>
+        <label class="label-team1" for="score1-in2">Team 1</label>
+        {{ macros.fancy_number_input(id='score1-in2', name='score1_in2', min=0, max=99, step=0.5, value=score1_in2, class='score-input') }}
+        <label class="label-team2" for="score2-in2">Team 2</label>
+        {{ macros.fancy_number_input(id='score2-in2', name='score2_in2', min=0, max=99, step=0.5, value=score2_in2, class='score-input') }}
+    </fieldset>
+
+    <div class="flex-responsive">
+        <button type="button" onclick="window.location.href='{{ next }}'" class="large-button cancel">Cancel</button>
         <button type="reset" class="large-button cancel">Reset</button>
 	    <button class="large-button" type="submit">Update</button>
 	</div>
+
 </form>
 
 </section>

@@ -50,13 +50,13 @@ INPUTS:
                 <td class="colgap"></td>
                 <td class="right">{{ row['points'] }}</td>
                 {% if current_user.is_authenticated %}
-                    <td class="center">
-                        <button class="small-button" title="Remove" onclick="confirmDialog('Remove {{ row['name'] }} and ALL associated matches?', '/teams/{{ row['id'] }}/delete?next={{ request.url }}')">
+                    <td class="center flex-responsive">
+                        <button title="Remove" onclick="confirmDialog('Remove {{ row['name'] }} and ALL associated matches?', '/teams/{{ row['id'] }}/delete?next={{ request.url }}')">
                             <i class="fa-solid fa-trash"></i>
                         </button>
-                        <a href="/teams/{{ row['id'] }}/edit?next={{ request.url }}">
-                            <button class="small-button" title="Edit"><i class="fa-solid fa-pencil"></i></button>
-                        </a>
+                        <button onclick="window.location.href='/teams/{{ row['id'] }}/edit?next={{ request.url }}'"title="Edit">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
                     </td>
                 {% endif %}
             </tr>

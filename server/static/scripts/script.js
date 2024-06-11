@@ -1,26 +1,3 @@
-async function paginated(url) {
-
-	url = window.location.origin + url;
-
-	results = [];
-
-	for (let page = 1;; page++) {
-
-		url = new URL(url);
-		url.searchParams.set("page", page);
-		const res = await fetch(url);
-		if (!res.ok) break;
-
-		res.json()
-			.then(json => {
-				json['data'].forEach(x => results.push(x));
-			})
-			.catch(console.error);
-	}
-
-	return results;
-}
-
 function confirmDialog(title, action, method='POST') {
 	if (confirm(title)) {
 		const form = document.createElement('form');
@@ -56,4 +33,34 @@ function removeRow(button) {
 	const row = parentOfType(button, 'tr');	
 	row.remove();
 }
+
+window.addEventListener('load', function() {
+
+	for (const elt of document.getElementsByClassName('fancy-number-inc')) {
+		const inp = document.getElementById(elt.getAttribute('for'));
+		elt.addEventListener('click', () => inp.stepUp());
+	}
+
+	for (const elt of document.getElementsByClassName('fancy-number-dec')) {
+		const inp = document.getElementById(elt.getAttribute('for'));
+		elt.addEventListener('click', () => inp.stepDown());
+	}
+
+	for (const label of document.getElementsByClassName('label-team1')) {
+		const select = document.getElementById('select-team1');
+		const update = () => {
+			label.textContent = select.options[select.selectedIndex].text;
+		}
+		select.addEventListener('input', update);
+		update();
+	}
+
+	for (const label of document.getElementsByClassName('label-team2')) {
+		const select = document.getElementById('select-team2');
+		const update = () => label.textContent = select.options[select.selectedIndex].text;
+		select.addEventListener('input', update);
+		update();
+	}
+
+});
 

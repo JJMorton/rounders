@@ -35,17 +35,9 @@ INPUTS:
                     <a class="team highlight" href="/teams/{{ match['teamid2'] }}">{{ match['name2'] }}</a>
                 </div>
                 {% if current_user.is_authenticated %}
-                    <div class="options">
-                        <div class="button-label-container" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')">
-                            <button name="remove-match" class="small-button"><i class="fa-solid fa-trash"></i></button>
-                            <label for="remove-match">Remove</label>
-                        </div>
-                        <a href="/matches/{{ match['id'] }}/edit?next={{ request.url }}">
-                            <div class="button-label-container">
-                                <button name="edit-match" class="small-button"><i class="fa-solid fa-pencil"></i></button>
-                                <label for="edit-match">Edit</label>
-                            </div>
-                        </a>
+                    <div class="options flex-responsive">
+                        <button name="remove-match" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')"><i class="fa-solid fa-trash"></i> Remove</button>
+                        <button name="edit-match" onclick="window.location.href='/matches/{{ match['id'] }}/edit?next={{ request.url }}'"><i class="fa-solid fa-pencil"></i> Edit</button>
                     </div>
                 {% endif %}
             </li>
