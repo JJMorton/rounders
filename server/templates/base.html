@@ -59,9 +59,6 @@
         <footer>
             <div class="left">
                 <p><i class="fa-solid fa-wand-magic-sparkles"></i> Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
-                {% if millis %}
-                    <code id="millis">Constructed response in {{ '%.4f' % millis }}ms</code>
-                {% endif %}
             </div>
             <div class="right">
                 {% if current_user.is_authenticated %}

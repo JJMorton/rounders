@@ -18,21 +18,8 @@ from . import db
 from . import formatting as fmt
 
 
-class Timer:
-    start_time: float
-
-    def __init__(self):
-        self.start_time = perf_counter()
-
-    @property
-    def elapsed_ms(self) -> float:
-        return perf_counter() - self.start_time
-
-
 @app.route('/')
 def home():
-    timer = Timer()
-
     now = datetime.now()
     today = datetime(year=now.year, month=now.month, day=now.day)
     weekday_start_sat = (today.weekday() + 2) % 7
@@ -61,15 +48,12 @@ def home():
         'home/index.html',
         matches=matches_df,
         title='Home',
-        millis=timer.elapsed_ms
     )
 
 
 @app.route('/teams/')
 def route_teams():
     """Get a list of all teams"""
-
-    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -149,7 +133,6 @@ def route_teams():
         year     = year,
         detailed = 'detailed' in request.args,
         years    = years,
-        millis   = timer.elapsed_ms,
     )
 
 
@@ -213,8 +196,6 @@ def route_teams_post():
 def route_teams_postform():
     """Get the form to create a team"""
 
-    timer = Timer()
-
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
     if not years: years.append(datetime.now().year)
@@ -228,15 +209,12 @@ def route_teams_postform():
         title   = f"New Team ({year})",
         year    = year,
         next    = request.args.get('next', default=f'/teams?year={year}'),
-        millis  = timer.elapsed_ms,
     )
 
 
 @app.route('/teams/<int:id>/')
 def route_team(id: int):
     """Get a single team"""
-
-    timer = Timer()
 
     team = db.get_or_404(Team, int(id))
 
@@ -268,7 +246,6 @@ def route_team(id: int):
         team    = team,
         matches = matches_df,
         players = players_df,
-        millis=timer.elapsed_ms,
     )
 
 
@@ -312,8 +289,6 @@ def route_team_patch(id):
 def route_team_patchform(id):
     """Get the form to edit a team"""
 
-    timer = Timer()
-
     team = db.get_or_404(Team, int(id))
 
     # Create table of teams for the form options
@@ -330,7 +305,6 @@ def route_team_patchform(id):
         name       = fmt.AsTeamName(team),
         players    = players_df,
         next       = request.args.get('next', default=f'/teams/{id}', type=str),
-        millis     = timer.elapsed_ms,
     )
 
 
@@ -375,8 +349,6 @@ def route_team_delete(id):
 @app.route('/matches/')
 def route_matches():
     """Get all matches"""
-
-    timer = Timer()
 
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
@@ -430,7 +402,6 @@ def route_matches():
         groupby = groupby,
         years   = years,
         year    = year,
-        millis  = timer.elapsed_ms,
     )
 
 
@@ -497,8 +468,6 @@ def route_matches_post():
 def route_matches_postform():
     """Get the form to create a match"""
 
-    timer = Timer()
-
     # Get a list of available years
     years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
     if not years: years.append(datetime.now().year)
@@ -527,7 +496,6 @@ def route_matches_postform():
         teams = teams_df,
         year  = year,
         next  = request.args.get('next', default='/matches/create'),
-        millis=timer.elapsed_ms,
     )
 
 
@@ -568,8 +536,6 @@ def route_match_patch(id):
 def route_match_patchform(id):
     """Get the form to edit a match"""
 
-    timer = Timer()
-
     match = db.get_or_404(Match, int(id))
 
     return render_template(
@@ -588,7 +554,6 @@ def route_match_patchform(id):
         score2_in2 = match.score2_in2,
         year       = match.team1.year,
         next       = request.args.get('next', default='/matches/create'),
-        millis     = timer.elapsed_ms,
     )
 
 
