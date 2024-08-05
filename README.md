@@ -14,13 +14,13 @@ Requires Python >= **3.11**.
 ## Available endpoints
 
 - `GET` `/`: The homepage
-- `GET` `/rules`: Rules of the game
+- `GET` `/rules/`: Rules of the game
 
 
 - `GET` `/teams/`: Get a list of all teams
 - \*`GET` `/teams/create/`: Get the form to create a team
 - \*`GET` `/teams/<int:id>/`: Get a single team
-- \*`GET` `/teams/<int:id>/edit`: Get the form to edit a team
+- \*`GET` `/teams/<int:id>/edit/`: Get the form to edit a team
 - \*`POST` `/teams/`: Create a team
 - \*`POST` `/teams/<int:id>/edit/`: Edit a team
 - \*`POST` `/teams/<int:id>/delete/`: Delete a team
@@ -32,6 +32,10 @@ Requires Python >= **3.11**.
 - \*`POST` `/matches/`: Create a match
 - \*`POST` `/matches/<int:id>/edit/`: Edit a match
 - \*`POST` `/matches/<int:id>/delete/`: Delete a match
+
+- `GET` `/photos/`: Get a view of all the posted photos
+- \*`POST` `/photos/`: Create a photo entry
+- \*`POST` `/photos/<int:id>/delete/`: Delete a photo entry
 
 
 \* *Requires authentication as the administrator*
