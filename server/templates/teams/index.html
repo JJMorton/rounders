@@ -43,10 +43,8 @@
     </form>
 </section>
 
-{% if teams.size > 0 %}
-    <section id="table-container">
-        {% include 'teams/table.html' %}
-    </section>
-{% endif %}
+<section id="table-container">
+    {% include 'teams/table.html' %}
+</section>
 
 {% endblock %}
