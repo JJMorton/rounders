@@ -2,6 +2,7 @@
 The Flask server and SQLite database
 """
 
+from pathlib import Path
 import config
 
 # Load environment variables from .env file
@@ -19,6 +20,11 @@ from sqlalchemy.engine import Engine
 # Create flask server
 
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='')
+# Limit content upload size to 20MB
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1000 * 1000
+# Create attachments folder for blogs
+app.config['ATTACHMENTS_FOLDER'] = Path(app.root_path, 'static/attachments')
+app.config['ATTACHMENTS_FOLDER'].mkdir(parents=True, exist_ok=True)
 
 
 # --------------------------------------------
@@ -44,5 +50,6 @@ def _set_sqlite_pragma(dbapi_connection, _):
 # Import submodules
 
 from . import models
+from . import blogs
 from . import routes
 from . import auth

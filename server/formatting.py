@@ -109,8 +109,10 @@ class AsDateTime(FormatAs):
 
 class AsDate(AsDateTime):
 
-    def __init__(self, timestamp: Optional[int], newest_first: bool = True):
-        super().__init__(timestamp, '%a %d %b', newest_first=newest_first)
+    def __init__(self, timestamp: Optional[int], newest_first: bool = True, with_year: bool = False):
+        fmt = '%a %d %b'
+        if with_year: fmt += ' %Y'
+        super().__init__(timestamp, fmt, newest_first=newest_first)
 
     @property
     def _name(self) -> str:

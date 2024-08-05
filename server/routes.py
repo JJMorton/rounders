@@ -3,16 +3,18 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+from typing import Sequence
 from dateutil import parser
-from flask import flash, redirect, render_template, request
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_required
 import pandas as pd
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
-from time import perf_counter
 
 from .models import Team, Player, Match
+from .blogs import Attachment, Entry
 from . import app
 from . import db
 from . import formatting as fmt
@@ -584,3 +586,120 @@ def route_match_delete(id):
 @app.route('/rules')
 def route_rules():
     return render_template('rules/index.html', title="Rules")
+
+
+@app.route('/photos')
+def route_photos():
+
+    # Fetch the blogs
+    pages = db.paginate(
+        db
+        .select(Entry)
+        .order_by(Entry.date.desc()),
+        per_page=request.args.get('per_page', type=int, default=5)
+    )
+    blogs: Sequence[Entry] = pages.items
+
+    df = pd.DataFrame(dict(
+        id    = [b.id for b in blogs],
+        title = [b.title for b in blogs],
+        text  = [b.text for b in blogs],
+        date  = [fmt.AsDate(b.date, with_year=True) for b in blogs],
+        attachments = [b.attachments for b in blogs],
+    ))
+
+    # Render only the table if the request is from htmx
+    template = 'photos/list.html' if request.headers.get('hx-request') else 'photos/index.html'
+
+    args_next = request.args  | {'page': str(pages.next_num)}
+    args_prev = request.args  | {'page': str(pages.prev_num)}
+    args_first = request.args | {'page': 1}
+    args_last = request.args  | {'page': pages.pages}
+
+    assert request.endpoint != None
+    return render_template(
+        template,
+        title="Photos",
+        blogs=df,
+        pagination=dict(
+            page=pages.page,
+            prev=url_for(request.endpoint, **args_prev) if pages.has_prev else "",
+            next=url_for(request.endpoint, **args_next) if pages.has_next else "",
+            first=url_for(request.endpoint, **args_first) if pages.pages > 1 and pages.page != 1 else "",
+            last=url_for(request.endpoint, **args_last) if pages.pages > 1 and pages.page != pages.pages else "",
+        ),
+    )
+
+
+@app.route('/photos', methods=['POST'])
+@login_required
+def route_photos_post():
+    redirect_url = '/photos'
+
+    title = request.form.get('title')
+    text = request.form.get('text')
+    if not title:
+        flash("Please enter a title for the post")
+        return redirect(redirect_url)
+
+    # Validate the attachments, if any
+    files = request.files.getlist('attachments')
+    timestamp = int(datetime.now(UTC).timestamp())
+    exts = [a.filename.rsplit('.', 1)[1] for a in files]
+    outputs = [f'{timestamp}_{i}.{ext}' for i, ext in enumerate(exts)]
+    allowed_exts = ['png', 'jpg', 'jpeg']
+    if not all(ext in allowed_exts for ext in exts):
+        flash("Files must have an extension from " + ', '.join(allowed_exts))
+        return redirect(redirect_url)
+
+    # Create the blog in the database
+    entry = Entry(
+        title = fmt.basic_sanitisation(title),
+        text  = fmt.basic_sanitisation(text) if text else None,
+        date  = timestamp,
+    )
+    db.session.add(entry)
+    db.session.commit()
+
+    if not entry.id:
+        flash("Something went wrong")
+        return redirect(redirect_url)
+
+    # Create the attachments in the database
+    attachments = [
+        Attachment(blog_id=entry.id, name=output)
+        for output in outputs
+    ]
+
+    for a in attachments:
+        db.session.add(a)
+    db.session.commit()
+
+    if not all(a.id for a in attachments):
+        flash("Something went wrong")
+        return redirect(redirect_url)
+
+    # Save the attachments to disk
+    for file, a in zip(files, attachments):
+        file.save(Path(app.config['ATTACHMENTS_FOLDER'], a.name))
+
+    return redirect(redirect_url)
+
+
+@app.route('/photos/<int:id>/delete/', methods=["POST"])
+@login_required
+def route_photo_delete(id):
+    """Delete a blog entry"""
+
+    entry = db.get_or_404(Entry, int(id))
+    redirect_url = request.args.get("next", default=f'/photos', type=str)
+
+    for a in entry.attachments:
+        a.delete()
+        db.session.delete(a)
+
+    db.session.delete(entry)
+    db.session.commit()
+
+    flash(f"Removed post")
+    return redirect(redirect_url)

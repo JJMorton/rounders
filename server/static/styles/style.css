@@ -322,10 +322,13 @@ form {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+textarea {
 	padding: 10px;
 	border: 1px solid var(--color-mid);
 	border-radius: var(--corner-radius);
+	width: 100%;
+	box-sizing: border-box;
 }
 
 input[type="checkbox"]:checked {
@@ -747,6 +750,61 @@ form.login {
 }
 
 
+/* Blogs */
+
+.blogs {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.blog {
+	width: 100%;
+	box-sizing: border-box;
+	margin-bottom: var(--content-padding);
+	border-bottom: 1px solid var(--color-mid);
+	padding-bottom: var(--content-padding);
+}
+
+.blog h2 {
+	margin: 0;
+}
+
+.blog .date {
+	margin-top: 0;
+	color: var(--color-mid);
+	font-size: 90%;
+}
+
+.blog img {
+	max-width: 100%;
+	box-sizing: border-box;
+	border-radius: var(--corner-radius);
+	display: block;
+	margin: 0 auto var(--content-padding) auto;
+	left: 0;
+	right: 0;
+}
+
+.blog button.delete {
+	float: right;
+}
+
+.page-nav i {
+	font-size: 120%;
+}
+
+.page-nav span {
+	margin: 0 5px;
+}
+
+.page-nav a[href=""] {
+	color: var(--color-mid);
+	cursor: default;
+	pointer-events: none;
+}
+
+
 /* Footer */
 
 footer {
@@ -777,8 +835,4 @@ footer .logo {
 	padding: 5px;
 	background-color: var(--color-mid);
 	border-radius: var(--corner-radius);
-}
-
-#millis {
-	font-size: 10px;
 }

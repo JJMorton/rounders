@@ -1,0 +1,25 @@
+{% if blogs.size > 0 %}
+	<ul class="blogs">
+		{% for _, blog in blogs.iterrows() %}
+			<li class="blog">
+				<h2>
+					{{ blog.title }}
+					{% if current_user.is_authenticated %}
+						<button class="delete" title="Delete" onclick="confirmDialog('Delete this post?', '/photos/{{ blog['id'] }}/delete?next={{ request.url }}')">
+							<i class="fa-solid fa-trash"></i> Delete
+						</button>
+                    {% endif %}
+				</h2>
+				<p class="date">Posted {{ blog.date }}</p> 
+				{% if blog.text %}
+					<p class="text">{{ blog.text }}</p>
+				{% endif %}
+				{% for a in blog.attachments %}
+					<a href="{{ a.url }}"><img src="{{ a.thumb }}"/></a>
+				{% endfor %}
+			</li>
+		{% endfor %}
+	</ul>
+{% else %}
+	<p>Nothing was posted here :(</p>
+{% endif %}

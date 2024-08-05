@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<section>
+    <form method="POST" action="/photos" enctype=multipart/form-data>
+        <fieldset>
+            <legend>Create a post</legend>
+            <div><input type="text" id="input-title" name="title" placeholder="Title" required/></div>
+            <div><textarea id="input-text" name="text" placeholder="Optional details..."></textarea></div>
+            <div><input type="file" multiple accept="image/png, image/jpeg" name="attachments"/></div>
+            <div><button><i class="fa-solid fa-paper-plane"></i> Create</button></div>
+        </fieldset>
+    </form>
+</section>
+{% endif %}
+
+<section id="list-container">
+    {% include 'photos/list.html' %}
+</section>
+
+<section class="page-nav">
+    <a title="First" href="{{ pagination.first }}"><span><i class="fa-solid fa-angles-left"></i></span></a>
+    <a title="Previous" href="{{ pagination.prev }}"><span><i class="fa-solid fa-angle-left"></i></span></a>
+    <span>Page {{ pagination.page }}</span>
+    <a title="Next" href="{{ pagination.next }}"><span><i class="fa-solid fa-angle-right"></i></span></a>
+    <a title="Last" href="{{ pagination.last }}"><span><i class="fa-solid fa-angles-right"></i></span></a>
+</section>
+
+{% endblock %}
