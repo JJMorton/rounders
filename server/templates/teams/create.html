@@ -10,27 +10,21 @@
         <fieldset>
             <legend>Players</legend>
 
-            <table class="many-row-input">
+            <div class="many-row-input">
                 <template>
-                    <tr>
-                        <td><input required type="text" name="name-first" placeholder="First Name"/></td>
-                        <td><input required type="text" name="name-last" placeholder="Last Name"/></td>
-                        <td><button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
+                    <div class="row">
+                        <input required type="text" name="name-first" placeholder="First Name"/>
+                        <input required type="text" name="name-last" placeholder="Last Name"/>
+                        <button type="button" class="large-button" onclick="removeRow(this)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </template>
-                <thead>
-                    <tr>
-                        <td colspan=3 class="button-label-container" onclick="addRow(this)">
-                            <button type="button" name="add-player" class="large-button">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                            <label for="add-player">Add Player</label>
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+                <div class="button-label-container" onclick="addRow(this)">
+                    <button type="button" name="add-player" class="large-button">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <label for="add-player">Add Player</label>
+                </div>
+            </div>
 
         </fieldset>
     	<a href="{{ next }}">

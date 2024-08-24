@@ -491,6 +491,17 @@ button:active {
 	transform: translate(1px, 1px);
 }
 
+.many-row-input {
+	display: grid;
+	gap: var(--content-padding);
+}
+
+.many-row-input > .row {
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
+	gap: var(--content-padding);
+}
+
 
 /* Figures */
 
@@ -556,36 +567,24 @@ td.colgap {
 	background-color: white;
 }
 
-table.many-row-input {
-	box-shadow: none;
-}
-
-table.many-row-input input[type="text"] {
-	height: 1em;
-}
-
-
 /* Home page */
 
-.quick-overview {
-	border: none;
-	box-shadow: none;
-	width: 100%;
+.faq {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: var(--content-padding);
 }
 
-.quick-overview tr {
-	background: none;
-}
-
-.quick-overview .question {
+.faq .question {
 	text-transform: uppercase;
 	font-family: "Oswald", sans-serif;
 	font-weight: bold;
 	text-align: right;
 	vertical-align: top;
+	position: relative;
 }
 
-.quick-overview address {
+.faq address {
 	display: inline;
 }
 

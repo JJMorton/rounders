@@ -8,29 +8,29 @@ function confirmDialog(title, action, method='POST') {
 	}
 }
 
-function parentOfType(elt, tag) {
+function parentWithClass(elt, cls) {
 	let e = elt;
-	while (e !== null && e.tagName.toLowerCase() !== tag.toLowerCase()) {
+	while (e !== null && !e.classList.contains(cls)) {
 		e = e.parentElement;
 	}
-	if (!e) throw Error(`Could not find parent with type ${tag} of element`, elt);
+	if (!e) throw Error(`Could not find parent with class ${cls} of element`, elt);
 	return e;
 }
 
 function addRow(button) {
-	const table = parentOfType(button, 'table');
-	const templ = table.querySelector('template');
-	if (!templ) throw Error('No row template found in table');
+	const outer = parentWithClass(button, 'many-row-input');
+	const templ = outer.querySelector('template');
+	if (!templ) throw Error('No template found in .many-row-input');
 
 	const newRow = templ.content.cloneNode(true);
 	const input = newRow.querySelector('input');
-	table.querySelector('tbody').appendChild(newRow);
+	outer.appendChild(newRow);
 	// Focus the first input if there is one
 	if (input) input.focus();
 }
 
 function removeRow(button) {
-	const row = parentOfType(button, 'tr');	
+	const row = parentWithClass(button, 'row');	
 	row.remove();
 }
 
