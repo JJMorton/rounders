@@ -12,16 +12,15 @@
     --corner-radius: 6px;
     --content-padding: 15px;
 
-	--font-color-dark: #222;
-	--divider-color: #aaa;
-	--divider-color-dark: #666;
-
 	--color-text-dark: #111;
+	--color-text-mid: #aaa;
 	--color-text-light: #eee;
+
 	--color-accent-dark: #233044;
 	--color-accent-light: #99c6ff;
-	--color-mid: #aaaaaa;
-	--color-dim: #d9d9d9;
+
+	--color-bg-dim: #edf6f9;
+	--color-bg-mid: #dde3ed;
 
 	--shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
 }
@@ -68,7 +67,7 @@ a[target="_blank"]::after {
 	vertical-align: super;
 	font: var(--fa-font-solid);
 	content: '\f08e';
-	color: var(--color-mid);
+	color: var(--color-text-mid);
 	font-size: 60%;
 	margin: 0 2px;
 	text-decoration: none;
@@ -261,7 +260,7 @@ header > #nav-bar {
 	display: block;
 	margin: 10px auto;
 	padding: var(--content-padding);
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-dim);
 	border-radius: var(--corner-radius);
 }
 
@@ -275,7 +274,7 @@ header > #nav-bar {
 dialog {
 	min-width: var(--min-page-width);
 	padding: 20px;
-	border: 1px solid var(--color-dim);
+	border: 1px solid var(--color-bg-dim);
 	border-radius: var(--corner-radius);
 	box-shadow: var(--shadow);
 }
@@ -325,7 +324,7 @@ input[type="text"],
 input[type="password"],
 textarea {
 	padding: 10px;
-	border: 1px solid var(--color-mid);
+	border: 1px solid var(--color-text-mid);
 	border-radius: var(--corner-radius);
 	width: 100%;
 	box-sizing: border-box;
@@ -354,7 +353,7 @@ input[type="time"],
 input[type="date"] {
 	height: var(--finger-size);
 	border-radius: var(--corner-radius);
-	border: 1px solid var(--color-mid);
+	border: 1px solid var(--color-text-mid);
 	background-color: #fff;
 	padding: 0 var(--content-padding);
 }
@@ -401,7 +400,7 @@ input.score-input {
 	text-align: center;
 	padding: 0;
 	border-radius: 0;
-	border: 1px solid var(--color-mid);
+	border: 1px solid var(--color-text-mid);
 	background-color: #fff;
 	font-size: 130%;
 }
@@ -425,8 +424,8 @@ input.score-input {
 
 fieldset {
 	padding: 10px;
-	border: 1px solid var(--color-mid);
-	background-color: var(--color-dim);
+	border: 1px solid var(--color-text-mid);
+	background-color: var(--color-bg-dim);
 	border-radius: var(--corner-radius);
 	margin: 10px 0;
 	display: flex;
@@ -435,13 +434,13 @@ fieldset {
 }
 
 legend {
-	color: var(--color-mid);
+	color: var(--color-text-mid);
 	font-size: 80%;
 }
 
 .button-label-container {
 	border-radius: var(--corner-radius);
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-dim);
 	padding: 4px;
 	display: inline-block;
 }
@@ -478,7 +477,7 @@ button.large-button {
 
 button.cancel {
 	background: none;
-	border: 1px solid var(--color-mid);
+	border: 1px solid var(--color-text-mid);
 }
 
 input:invalid,
@@ -520,7 +519,7 @@ table {
 }
 
 tr:nth-of-type(odd) {
-    background-color: var(--color-dim);
+    background-color: var(--color-bg-dim);
 }
 
 td.left, th.left {
@@ -606,7 +605,7 @@ iframe.map {
 	top: 0;
 	background-color: #fff;
 	font-size: 90%;
-	color: var(--color-mid);
+	color: var(--color-text-mid);
 	font-weight: bold;
 	text-align: center;
 	text-transform: uppercase;
@@ -623,11 +622,12 @@ ul.matches {
 	border-radius: var(--corner-radius);
 	overflow: hidden;
 	background-color: var(--color-text-light);
+	box-shadow: var(--shadow);
 }
 
 .match-card > .date-time {
 	height: 30px;
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-mid);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -692,7 +692,7 @@ ul.matches {
 	height: 40px;
 	box-sizing: border-box;
 	padding: calc(0.25 * var(--content-padding));
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-mid);
 	display: flex;
 	justify-content: flex-start;
 	gap: calc(0.5 * var(--content-padding));
@@ -721,7 +721,7 @@ ul.players {
 }
 
 ul.players .player {
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-dim);
 	border-radius: var(--corner-radius);
 	padding: 5px;
 }
@@ -778,7 +778,7 @@ form.login {
 	width: 100%;
 	box-sizing: border-box;
 	margin-bottom: var(--content-padding);
-	border-bottom: 1px solid var(--color-mid);
+	border-bottom: 1px solid var(--color-text-mid);
 	padding-bottom: var(--content-padding);
 }
 
@@ -788,7 +788,7 @@ form.login {
 
 .blog .date {
 	margin-top: 0;
-	color: var(--color-mid);
+	color: var(--color-text-mid);
 	font-size: 90%;
 }
 
@@ -815,7 +815,7 @@ form.login {
 }
 
 .page-nav a[href=""] {
-	color: var(--color-mid);
+	color: var(--color-text-mid);
 	cursor: default;
 	pointer-events: none;
 }
@@ -826,7 +826,7 @@ form.login {
 footer {
 	flex: 1;
 	margin-top: 40px;
-	background-color: var(--color-dim);
+	background-color: var(--color-bg-dim);
 	padding: var(--content-padding) max(calc(50% - 0.5 * var(--max-page-width)), 0px);
 	display: flex;
 	flex-direction: row;
@@ -843,12 +843,12 @@ footer > .right {
 
 footer * {
 	flex: 1;
-    color: var(--color-mid);
+    color: var(--color-text-mid);
 }
 
 footer .logo {
 	height: 50px;
 	padding: 5px;
-	background-color: var(--color-mid);
+	background-color: var(--color-text-mid);
 	border-radius: var(--corner-radius);
 }
