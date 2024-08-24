@@ -456,9 +456,9 @@ legend {
 }
 
 button {
-	background-color: var(--color-accent-light);
+	background: var(--color-text-light);
 	outline: none;
-	border: none;
+	border: 1px solid var(--color-bg-mid);
 	border-radius: var(--corner-radius);
 	cursor: pointer;
 	display: inline-flex;
@@ -469,6 +469,8 @@ button {
 }
 
 button.large-button {
+	border: none;
+	background-color: var(--color-accent-light);
 	min-width: var(--finger-size);
 	height: var(--finger-size);
 	font-size: 90%;
@@ -621,7 +623,7 @@ ul.matches {
 .match-card {
 	border-radius: var(--corner-radius);
 	overflow: hidden;
-	background-color: var(--color-text-light);
+	background-color: var(--color-bg-dim);
 	box-shadow: var(--shadow);
 }
 
