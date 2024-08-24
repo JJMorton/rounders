@@ -16,13 +16,43 @@ INPUTS:
 <figure>
     <ul class="matches">
         {% for _, match in matches.iterrows() %}
-            <li>
-                <div class="match">
-                    <div class="datetime">
+            <li class="match-card">
+                    <div class="date-time">
                         <span class="date">{{ match['date'] }}</span>
+                        <span>&#47;</span>
                         <span class="time">{{ match['time'] }}</span>
                     </div>
-                    <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
+                    <div class="teams-scores">
+                        <div class="team-score">
+                            {% if match['score1'] > match['score2'] %}
+                                <i class="fa-solid fa-crown animate-pulse"></i>
+                            {% endif %}
+                            <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
+                            <div class="score {{ 'winner' if match['score1'] >= match['score2'] else '' }}">
+                                <span>{{ match['score1'] }}</span>
+                            </div>
+                        </div>
+                        <div class="team-score">
+                            {% if match['score2'] > match['score1'] %}
+                                <i class="fa-solid fa-crown animate-pulse"></i>
+                            {% endif %}
+                            <a class="team highlight" href="/teams/{{ match['teamid2'] }}">{{ match['name2'] }}</a>
+                            <div class="score {{ 'winner' if match['score2'] >= match['score1'] else '' }}">
+                                <span>{{ match['score2'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                        <div class="options">
+                            <button name="remove-match" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')">
+                                <i class="fa-solid fa-trash"></i> Remove
+                            </button>
+                            <button name="edit-match" onclick="window.location.href='/matches/{{ match['id'] }}/edit?next={{ request.url }}'">
+                                <i class="fa-solid fa-pencil"></i> Edit
+                            </button>
+                        </div>
+                    {% endif %}
+<!--                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
                     <span class="details">
                         {% if match['played'] %}
                             <span class="score {{ 'winner animate-pulse' if match['score1'] > match['score2'] else '' }}">{{ match['score1'] }}</span>
@@ -39,7 +69,7 @@ INPUTS:
                         <button name="remove-match" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')"><i class="fa-solid fa-trash"></i> Remove</button>
                         <button name="edit-match" onclick="window.location.href='/matches/{{ match['id'] }}/edit?next={{ request.url }}'"><i class="fa-solid fa-pencil"></i> Edit</button>
                     </div>
-                {% endif %}
+                {% endif %} -->            
             </li>
         {% endfor %}
     </ul>
