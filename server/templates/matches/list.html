@@ -52,24 +52,6 @@ INPUTS:
                             </button>
                         </div>
                     {% endif %}
-<!--                     <a class="team highlight" href="/teams/{{ match['teamid1'] }}">{{ match['name1'] }}</a>
-                    <span class="details">
-                        {% if match['played'] %}
-                            <span class="score {{ 'winner animate-pulse' if match['score1'] > match['score2'] else '' }}">{{ match['score1'] }}</span>
-                            <span class="versus">:</span>
-                            <span class="score {{ 'winner animate-pulse' if match['score2'] > match['score1'] else '' }}">{{ match['score2'] }}</span>
-                        {% else %}
-                            vs.
-                        {% endif %}
-                    </span>
-                    <a class="team highlight" href="/teams/{{ match['teamid2'] }}">{{ match['name2'] }}</a>
-                </div>
-                {% if current_user.is_authenticated %}
-                    <div class="options flex-responsive">
-                        <button name="remove-match" onclick="confirmDialog('Remove match at {{ match['date'] }} {{ match['time'] }}?', '/matches/{{ match['id'] }}/delete?next={{ request.url }}')"><i class="fa-solid fa-trash"></i> Remove</button>
-                        <button name="edit-match" onclick="window.location.href='/matches/{{ match['id'] }}/edit?next={{ request.url }}'"><i class="fa-solid fa-pencil"></i> Edit</button>
-                    </div>
-                {% endif %} -->            
             </li>
         {% endfor %}
     </ul>
