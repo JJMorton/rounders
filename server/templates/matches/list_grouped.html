@@ -22,7 +22,7 @@ INPUTS:
 	{% if matches|length > 0 %}
 	    <h2>Scheduled</h2>
 	    {% for group, matches in matches.groupby(groupby) %}
-	        <p class="group-title">{{ group }}</p>
+	        <p class="group-title"><i class="fa-solid fa-caret-down"></i> {{ group }} <i class="fa-solid fa-caret-down"></i></p>
 	        {% include 'matches/list.html' %}
 	    {% endfor %}
 	{% endif %}
@@ -32,7 +32,7 @@ INPUTS:
     {% if matches|length > 0 %}
 	    <h2>Results</h2>
 	    {% for group, matches in matches.groupby(groupby) %}
-	        <p class="group-title">{{ group }}</p>
+	        <p class="group-title"><i class="fa-solid fa-caret-down"></i> {{ group }} <i class="fa-solid fa-caret-down"></i></p>
 	    	{% include 'matches/list.html' %}
 	    {% endfor %}
     {% endif %}
