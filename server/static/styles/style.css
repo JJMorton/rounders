@@ -537,6 +537,7 @@ table.rankings tr:not(.header) {
 	background-color: var(--color-bg-dim);
 	outline: 1px solid var(--color-text-mid);
 	height: 55px;
+	box-shadow: var(--shadow);
 }
 
 table.rankings td:first-of-type,
