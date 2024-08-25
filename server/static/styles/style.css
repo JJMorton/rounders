@@ -630,7 +630,7 @@ iframe.map {
 ul.matches {
 	list-style: none;
 	display: grid;
-	grid-gap: 10px;
+	grid-gap: var(--content-padding);
 	padding: 0;
 }
 
