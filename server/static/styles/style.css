@@ -111,7 +111,7 @@ body {
 
 @keyframes slide-right {
 	0% {
-		transform: translateX(-10px);
+		transform: translateX(-20px);
 		opacity: 0;
 	}
 	100% {
@@ -520,19 +520,38 @@ figure > figcaption {
 }
 
 
-/* Tables */
+/* Rankings table */
 
-table {
+table.rankings {
     border-radius: var(--corner-radius);
-    border-spacing: 0;
-    overflow: hidden;
-    padding: 0;
-    min-width: 200px;
-    box-shadow: var(--shadow);
+    border-spacing: 0 var(--content-padding);
+    width: 100%;
+    max-width: 600px;
 }
 
-tr:nth-of-type(odd) {
-    background-color: var(--color-bg-dim);
+table.rankings tr {
+	border-radius: var(--corner-radius);
+}
+
+table.rankings tr:not(.header) {
+	background-color: var(--color-bg-dim);
+	outline: 1px solid var(--color-text-mid);
+	height: 55px;
+}
+
+table.rankings td:first-of-type,
+table.rankings th:first-of-type {
+	padding-left: var(--content-padding);
+}
+
+table.rankings td:last-of-type,
+table.rankings th:last-of-type {
+	padding-right: var(--content-padding);
+}
+
+table.rankings td,
+table.rankings th {
+	min-width: 35px;
 }
 
 td.left, th.left {
@@ -547,21 +566,17 @@ td.center, th.center {
     text-align: center;
 }
 
-td, th {
-    padding: 0.5em 1em;
+table.rankings th {
+	font-weight: 800;
+    color: var(--color-text-mid);
 }
 
-th {
-    background-color: var(--color-accent-light);
-    color: var(--color-text-dark);
-}
-
-th[scope="column"] {
+table.rankings th[scope="column"] {
 	height: 2em;
 }
 
-th.colgap,
-td.colgap {
+table.rankings th.colgap,
+table.rankings td.colgap {
 	padding: 0;
 	width: 2px;
 	background-color: white;

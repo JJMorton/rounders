@@ -14,52 +14,39 @@ INPUTS:
 
 {% if teams.size > 0 %}
 <figure>
-    <table>
-        <tr>
-            <th scope="column" class="left">Name</th>
-            <td class="colgap"></td>
+    <table class="rankings">
+        <tr class="header">
+            <th scope="column" class="left">Team</th>
             {% if detailed %}
-                <th scope="column" class="right" title="Rounders Scored">R+</th>
-                <th scope="column" class="right" title="Rounders Conceded">R-</th>
-                <th scope="column" class="right" title="Rounders Difference">RD</th>
+                <th scope="column" class="center" title="Rounders Scored">R+</th>
+                <th scope="column" class="center" title="Rounders Conceded">R-</th>
+                <th scope="column" class="center" title="Rounders Difference">RD</th>
             {% else %}
-                <th scope="column" class="right" title="Played">P</th>
-                <th scope="column" class="right" title="Wins">W</th>
-                <th scope="column" class="right" title="Losses">L</th>
-                <th scope="column" class="right" title="Draws">D</th>
+                <th scope="column" class="center" title="Played">P</th>
+                <th scope="column" class="center" title="Wins">W</th>
+                <th scope="column" class="center" title="Losses">L</th>
+                <th scope="column" class="center" title="Draws">D</th>
             {% endif %}
-            <td class="colgap"></td>
-            <th scope="column" class="right" title="Points">PTS</th>
-            {% if current_user.is_authenticated %}
-                <th scope="column">Action</th>
-            {% endif %}
+            <th scope="column" class="center" title="Points">PTS</th>
+
         </tr>
         {% for _, row in teams.iterrows() %}
             <tr class="animate-slide-right" style="animation-delay: {{ loop.index * 30 }}ms">
-                <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></td>
-    	        <td class="colgap"></td>
+                <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">
+                    <strong>{{ row['name'] }}</strong>
+                </a></td>
                 {% if detailed %}
-                    <td class="right">{{ row['scored'] }}</td>
-                    <td class="right">{{ row['conceded'] }}</td>
-                    <td class="right">{{ row['difference'] }}</td>
+                    <td class="center">{{ row['scored'] }}</td>
+                    <td class="center">{{ row['conceded'] }}</td>
+                    <td class="center">{{ row['difference'] }}</td>
                 {% else %}
-                    <td class="right">{{ row['match_count'] or 0 }}</td>
-                    <td class="right">{{ row['wins'] }}</td>
-                    <td class="right">{{ row['losses'] }}</td>
-                    <td class="right">{{ row['draws'] }}</td>
+                    <td class="center">{{ row['match_count'] or 0 }}</td>
+                    <td class="center">{{ row['wins'] }}</td>
+                    <td class="center">{{ row['losses'] }}</td>
+                    <td class="center">{{ row['draws'] }}</td>
                 {% endif %}
-                <td class="colgap"></td>
-                <td class="right">{{ row['points'] }}</td>
-                {% if current_user.is_authenticated %}
-                    <td class="center flex-responsive">
-                        <button title="Remove" onclick="confirmDialog('Remove {{ row['name'] }} and ALL associated matches?', '/teams/{{ row['id'] }}/delete?next={{ request.url }}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                        <button onclick="window.location.href='/teams/{{ row['id'] }}/edit?next={{ request.url }}'"title="Edit">
-                            <i class="fa-solid fa-pencil"></i>
-                        </button>
-                    </td>
-                {% endif %}
+                <td class="center"><strong>{{ row['points'] }}</strong></td>
+
             </tr>
         {% endfor %}
     </table>

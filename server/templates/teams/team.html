@@ -2,6 +2,26 @@
 
 {% block content %}
 
+{% if current_user.is_authenticated %}
+<section>
+
+    <div class="button-label-container">
+        <a onclick="confirmDialog('Remove {{ team.name }} and ALL associated matches?', '/teams/{{ team.id }}/delete?next=/teams')">
+            <button name="remove-team" class="large-button"><i class="fa-solid fa-trash"></i></button>
+            <label for="remove-team">Remove Team</label>
+        </a>
+    </div>
+
+    <div class="button-label-container">
+        <a href="/teams/{{ team.id }}/edit?next={{ request.url }}">
+            <button name="edit-team" class="large-button"><i class="fa-solid fa-pencil"></i></button>
+            <label for="edit-team">Edit Team</label>
+        </a>
+    </div>
+
+</section>
+{% endif %}
+
 {% if players.size > 0 %}
 <section>
     <h2>Members</h2>
