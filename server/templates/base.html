@@ -42,9 +42,13 @@
         </header>
 
         <div id="content-wrapper">
-            <div id="content">
+            {% block title %}
+            <div id="title-wrapper">
                 <h1>{{ title }}</h1>
+            </div>
+            {% endblock %}
 
+            <div id="content">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 {% for message in messages %}
@@ -59,13 +63,17 @@
 
         <footer>
             <div class="left">
-                <p><i class="fa-solid fa-wand-magic-sparkles"></i> Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
+                <p><strong>Exeter PGR Summer Rounders</strong></p>
+                <p><i>June &#38; July, 18:00 - 20:00 Mondays &#38; Thursdays</i></p>
+                <p><i>Exwick Cricket Club grounds, <a class="highlight" target="_blank" href="https://maps.app.goo.gl/pdpSGDc7mhPJduF1A">EX4 1EG</a></i></p>
+                <p><i>what3words:</i> <a class="highlight" target="_blank" href="https://w3w.co/handle.skill.will">///handle.skill.will</a></p>
             </div>
             <div class="right">
+                <p><i class="fa-solid fa-wand-magic-sparkles"></i> Website by Jack Morton, source on <a class="highlight" target="_blank" href="https://github.com/JJMorton/rounders">GitHub</a></p>
                 {% if current_user.is_authenticated %}
-                    <p><a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></p>
+                    <p><a class="highlight" href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></p>
                 {% else %}
-                    <p><a href="/login"><i class="fa-solid fa-right-to-bracket"></i> Admin Login</a></p>
+                    <p><a class="highlight" href="/login"><i class="fa-solid fa-right-to-bracket"></i> Admin Login</a></p>
                 {% endif %}
             </div>
         </footer>

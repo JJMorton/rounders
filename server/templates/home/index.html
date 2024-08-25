@@ -1,48 +1,46 @@
 {% extends "base.html" %}
 
+{% block title %}
+<div id="home-banner">
+	<div>
+		<h1>Exeter PGR Summer Rounders</h1>
+		<p>A fun tournament organised by postgrads, for postgrads!</p>
+	</div>
+</div>
+{% endblock %}
+
 {% block content %}
 
-{% if matches|length > 0 %}
-<section>
-	<h2>Next Matches</h2>
-	{% include 'matches/list.html' %}
-</section>
-{% endif %}
-
-<section>
-	{% if matches|length > 0 %}
-	<h2>Overview</h2>
-	{% endif %}
-
-	<div class="faq">
-		<span class="question">What?</span>
-		<span class="answer">A summer rounders tournament organised by postgrads, for postgrads!</span>
-
-		<span class="question">When?</span>
-		<span class="answer">18:00 and 19:00 on Mondays and Thursdays, running from the week of 10th June until the week of 22nd July.</span>
-
-		<span class="question">Who?</span>
-        <span class="answer">Organised by Tom Joshi-Cale, Bel Hartley and Katie Milsom. Contact <address><a class="highlight" href="mailto:tj294@exeter.ac.uk">tj294@exeter.ac.uk</a></address> with any queries.</span>
-
-		<span class="question">How?</span>
-		<span class="answer">It's very casual, but <a class="highlight" href="/rules">here's an outline of the rules</a> if you need to brush up!</span>
-
-		<span class="question">Where?</span>
-		<span class="answer">
-			The Exwick Cricket Club grounds, EX4 1EG. Over the river from Mill on the Exe, next to the Flowerpot Playing Fields.
-		</span>
-
-		<!-- <div> -->
-			<!-- <span class="question">Sign me up!</span> -->
-			<!-- <span class="answer">Great! Sign up as a team or an individual by completing <a class="highlight" target="_blank" href="https://forms.office.com/Pages/ResponsePage.aspx?id=d10qkZj77k6vMhM02PBKUw6_kGGZzg9KraJuxFzesK5UM1BQWFpWSENQOTFaUDQ0SVdVNFNNU0RDMy4u">this form</a>.</span> -->
-		<!-- </div> -->
-
-	</div>
+<section id="home-details">
+	<p><strong>
+		Are you a PhD student or postdoc in Exeter? Looking for something to do over the summer?
+	</strong></p>
+	<p>
+		Join us for some rounders! We welcome sign-ups <strong>individually or as a team</strong>. It’s casual fun, so bring the office along, or come and meet some new people!
+	</p>
+	<p>
+		We organise matches <strong>twice a week from 6PM</strong> by the Exwick Cricket Club grounds, <strong><a class="highlight" target="_blank" href="https://maps.app.goo.gl/pdpSGDc7mhPJduF1A">EX4 1EG</a></strong>.
+	</p>
 </section>
 
 <section>
 	<figure>
-		<iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3091.634485509637!2d-3.5458249049514396!3d50.72486091575009!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x486da5ac925d2877%3A0x919190ab2f80eb73!2sExwick%20Cricket%20Club%20Home%20Ground!5e0!3m2!1sen!2suk!4v1714951892025!5m2!1sen!2suk" width="500" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+		<table class="winners">
+			<tr class="header">
+				<th scope="column" class="left">Year</th>
+				<th scope="column" class="left">Winning Team</th>
+				<th scope="column" class="center" title="Avg. rounders scored per match">R+</th>
+				<th scope="column" class="center" title="Points">PTS</th>
+			</tr>
+	        {% for _, row in winners.iterrows() %}
+				<tr>
+					<td class="left">{{ row['year'] }}</td>
+					<td class="left"><strong><a href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></strong></td>
+					<td class="center">{{ row['rounders'] }}</td>
+					<td class="center">{{ row['points'] }}</td>
+				</tr>
+			{% endfor %}
+		</table>
 	</figure>
 </section>
 

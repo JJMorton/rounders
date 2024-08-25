@@ -3,10 +3,11 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Sequence
 from dateutil import parser
+import config
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_required
 import pandas as pd
@@ -22,33 +23,37 @@ from . import formatting as fmt
 
 @app.route('/')
 def home():
-    now = datetime.now()
-    today = datetime(year=now.year, month=now.month, day=now.day)
-    weekday_start_sat = (today.weekday() + 2) % 7
-    weekstart = (today - timedelta(days=weekday_start_sat)).timestamp()
-    weekend = (today + timedelta(days=7 - weekday_start_sat)).timestamp()
-    matches = db.session.scalars(
+
+    years = sorted(db.session.execute(db.select(Team.year).distinct()).scalars().all())
+    years = [y for y in years if y <= config.LAST_COMPLETE_YEAR][::-1]
+
+    teams: list[Team] = db.session.scalars(
         db
-        .select(Match)
-        .filter(and_(Match.play_date >= weekstart, Match.play_date < weekend))
+        .select(Team)
     ).all()
 
-    matches_df = pd.DataFrame(dict(
-        date    = [fmt.AsDate(m.play_date, newest_first=False) for m in matches],
-        time    = [fmt.AsTime(m.play_date, newest_first=False) for m in matches],
-        id      = [m.id for m in matches],
-        name1   = [fmt.AsTeamName(m.team1) for m in matches],
-        name2   = [fmt.AsTeamName(m.team2) for m in matches],
-        teamid1 = [m.team1.id for m in matches],
-        teamid2 = [m.team2.id for m in matches],
-        score1  = [fmt.AsScore(m.score1) for m in matches],
-        score2  = [fmt.AsScore(m.score2) for m in matches],
-        played  = [m.played for m in matches],
-    )).sort_values('date')
+    teams = sorted(teams, key=lambda t: t.net_rounders, reverse=True)
+    teams = sorted(teams, key=lambda t: t.num_points, reverse=True)
+
+    def first_with_year(teams, year) -> Team | None:
+        for t in teams:
+            if t.year == year: return t
+        return None
+
+    winners = [first_with_year(teams, y) for y in years]
+    winners = [w for w in winners if w]
+
+    df = pd.DataFrame(dict(
+        id       = [t.id for t in winners],
+        year     = [t.year for t in winners],
+        name     = [fmt.AsTeamName(t) for t in winners],
+        points   = [t.num_points for t in winners],
+        rounders = [fmt.AsScore(t.num_rounders_scored / max(t.num_matches_played, 1)) for t in winners]
+    ))
 
     return render_template(
         'home/index.html',
-        matches=matches_df,
+        winners=df,
         title='Home',
     )
 
@@ -66,59 +71,25 @@ def route_teams():
     year: int = request.args.get('year', default=years[-1], type=int)
 
     # Fetch the teams
-    teams = db.session.scalars(
+    teams: list[Team] = db.session.scalars(
         db
         .select(Team)
         .where(Team.year == year)
         .order_by(Team.id)
     ).all()
 
-    # Fetch all matches played by each team
-    matches = [
-        [
-            match for match in db.session.scalars(
-                db.select(Match).where(or_(Match.team1_id == team.id, Match.team2_id == team.id))
-            ).all()
-            if match.played
-        ]
-        for team in teams
-    ]
-
-    # Compute no. of plays, wins, losses, etc.
-    played = [len(m) for m in matches]
-    wins = [
-        len([m for m in ms if m.winner and m.winner.id == team.id])
-        for ms, team in zip(matches, teams)
-    ]
-    draws = [
-        len([m for m in ms if m.winner is None])
-        for ms in matches
-    ]
-    losses = [p - w - d for p, w, d in zip(played, wins, draws)]
-    points = [2 * w + d for w, d in zip(wins, draws)]
-
-    # Total number of rounders scored and conceded
-    scored = [
-        sum(m.pov_score(team).home or 0 for m in ms)
-        for ms, team in zip(matches, teams)
-    ]
-    conceded = [
-        sum(m.pov_score(team).away or 0 for m in ms)
-        for ms, team in zip(matches, teams)
-    ]
-
     # Create table of teams, total scores and play count, sorting by score
     teams_df = pd.DataFrame(dict(
         id          = [t.id for t in teams],
         name        = [fmt.AsTeamName(t) for t in teams],
-        match_count = played,
-        points      = points,
-        wins        = wins,
-        draws       = draws,
-        losses      = losses,
-        scored      = [ fmt.AsScore(s / p if p else 0) for s, p in zip(scored, played) ],
-        conceded    = [ fmt.AsScore(c / p if p else 0) for c, p in zip(conceded, played) ],
-        difference  = [ fmt.AsScore((s - c) / p if p else 0) for s, c, p in zip(scored, conceded, played) ],
+        match_count = [ t.num_matches_played for t in teams ],
+        points      = [ t.num_points for t in teams ],
+        wins        = [ t.num_wins for t in teams ],
+        draws       = [ t.num_draws for t in teams ],
+        losses      = [ t.num_losses for t in teams ],
+        scored      = [ fmt.AsScore(t.num_rounders_scored / max(t.num_matches_played, 1)) for t in teams ],
+        conceded    = [ fmt.AsScore(t.num_rounders_conceded / max(t.num_matches_played, 1)) for t in teams ],
+        difference  = [ fmt.AsScore(t.net_rounders / max(t.num_matches_played, 1)) for t in teams ],
     )).sort_values('difference', ascending=False).sort_values('points', ascending=False)
 
     sortby = request.args.get('sortby')

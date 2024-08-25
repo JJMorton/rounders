@@ -4,9 +4,10 @@ Data models to represent entities in the database
 
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, or_
 from dataclasses import dataclass
 
 from . import db, app
@@ -37,6 +38,46 @@ class Team(db.Model):
     """Matches in which this was the second team"""
     players: Mapped[list["Player"]] = relationship(foreign_keys="Player.team_id", back_populates="team", lazy="dynamic")
     """Members of this team"""
+
+    @cached_property
+    def matches(self) -> list[Match]:
+        return db.session.scalars(
+            db.select(Match).where(
+                or_(Match.team1_id == self.id, Match.team2_id == self.id)
+            )
+        ).all()
+ 
+    @cached_property
+    def num_matches_played(self) -> int:
+        return len([m for m in self.matches if m.played])
+
+    @cached_property
+    def num_wins(self) -> int:
+        return len([m for m in self.matches if m.winner and m.winner.id == self.id])
+
+    @cached_property
+    def num_draws(self) -> int:
+        return len([m for m in self.matches if m.played and m.winner is None])
+
+    @cached_property
+    def num_losses(self) -> int:
+        return len([m for m in self.matches if m.winner and m.winner.id != self.id])
+
+    @cached_property
+    def num_points(self) -> int:
+        return 2 * self.num_wins + self.num_draws
+
+    @cached_property
+    def num_rounders_scored(self) -> float:
+        return sum([m.pov_score(self).home or 0 for m in self.matches if m.played])
+
+    @cached_property
+    def num_rounders_conceded(self) -> float:
+        return sum([m.pov_score(self).away or 0 for m in self.matches if m.played])
+
+    @cached_property
+    def net_rounders(self) -> float:
+        return self.num_rounders_scored - self.num_rounders_conceded
 
 
 class Player(db.Model):

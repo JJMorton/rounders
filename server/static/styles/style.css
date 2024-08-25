@@ -11,6 +11,7 @@
 
     --corner-radius: 6px;
     --content-padding: 15px;
+    --title-height: 77px;
 
 	--color-text-dark: #111;
 	--color-text-mid: #aaa;
@@ -32,6 +33,7 @@ body, html {
 
 body {
 	min-height: 100vh;
+	min-width: var(--min-page-width);
 	display: flex;
 	flex-direction: column;
 }
@@ -88,15 +90,15 @@ h2 {
 	font-style: italic;
 }
 
-body {
-	min-width: var(--min-page-width);
-}
-
 .flex-row, .flex-responsive {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	gap: var(--content-padding);
+}
+
+hr {
+	color: var(--color-bg-dim);
 }
 
 @media (width <= 600px) {
@@ -243,16 +245,15 @@ header > #nav-bar {
 #content-wrapper {
 	width: 100%;
 	box-sizing: border-box;
-	padding: var(--card-gap);
+	min-height: 50vh;
 }
 
-#content {
+#content,
+#title-wrapper {
 	max-width: var(--max-page-width);
 	margin: 0 auto;
-    padding: var(--content-padding);
-    padding-top: 0;
+    padding: 0 var(--content-padding);
 }
-
 
 /* Flash */
 
@@ -520,38 +521,68 @@ figure > figcaption {
 }
 
 
+/* Homepage banner */
+
+#home-banner {
+	padding: calc(2 * var(--content-padding)) var(--content-padding);
+	background-color: var(--color-bg-dim);
+	margin-bottom: var(--content-padding);
+}
+
+#home-banner > div {
+	max-width: var(--max-page-width);
+	margin: 0 auto;
+}
+
+#home-banner h1,
+#home-banner p {
+	color: var(--color-accent-dark);
+	margin: 0;
+}
+
+#home-banner h1 {
+	font-size: 40px;
+	line-height: 50px;
+	margin-bottom: 5px;
+}
+
+#home-banner p {
+	font-size: 20px;
+}
+
+
 /* Rankings table */
 
-table.rankings {
+table {
     border-radius: var(--corner-radius);
     border-spacing: 0 var(--content-padding);
     width: 100%;
     max-width: 600px;
 }
 
-table.rankings tr {
+table tr {
 	border-radius: var(--corner-radius);
 }
 
-table.rankings tr:not(.header) {
+table tr:not(.header) {
 	background-color: var(--color-bg-dim);
 	outline: 1px solid var(--color-text-mid);
 	height: 55px;
 	box-shadow: var(--shadow);
 }
 
-table.rankings td:first-of-type,
-table.rankings th:first-of-type {
+table td:first-of-type,
+table th:first-of-type {
 	padding-left: var(--content-padding);
 }
 
-table.rankings td:last-of-type,
-table.rankings th:last-of-type {
+table td:last-of-type,
+table th:last-of-type {
 	padding-right: var(--content-padding);
 }
 
-table.rankings td,
-table.rankings th {
+table td,
+table th {
 	min-width: 35px;
 }
 
@@ -567,17 +598,17 @@ td.center, th.center {
     text-align: center;
 }
 
-table.rankings th {
+table th {
 	font-weight: 800;
     color: var(--color-text-mid);
 }
 
-table.rankings th[scope="column"] {
+table th[scope="column"] {
 	height: 2em;
 }
 
-table.rankings th.colgap,
-table.rankings td.colgap {
+table th.colgap,
+table td.colgap {
 	padding: 0;
 	width: 2px;
 	background-color: white;
@@ -611,7 +642,9 @@ iframe.map {
 	aspect-ratio: 1.5;
 	box-shadow: var(--shadow);
 	border-radius: var(--corner-radius);
-	margin: 10px 0;
+	left: 0;
+	right: 0;
+	margin: 10px auto;
 }
 
 
@@ -844,18 +877,18 @@ footer {
 	flex: 1;
 	margin-top: 40px;
 	background-color: var(--color-bg-dim);
-	padding: var(--content-padding) max(calc(50% - 0.5 * var(--max-page-width)), 0px);
+	padding: var(--content-padding) max(calc(50% - 0.5 * var(--max-page-width)), var(--content-padding));
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 }
 
-footer > .left {
-	padding: 0 0 0 var(--content-padding);
-}
-
-footer > .right {
-	padding: 0 var(--content-padding) 0 0;
-	text-align: right;
+@media (width > 600px) {
+	footer {
+		flex-direction: row;
+	}
+	footer > .right {
+		text-align: right;
+	}
 }
 
 footer * {

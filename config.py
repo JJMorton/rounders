@@ -8,3 +8,8 @@ THUMB_SIZE = 800
 """
 Maximum size of thumbnails
 """
+
+LAST_COMPLETE_YEAR = 2024
+"""
+The latest year which has been played.
+"""
