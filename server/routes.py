@@ -13,6 +13,7 @@ from flask_login import login_required
 import pandas as pd
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
+import re
 
 from .models import Team, Player, Match
 from .blogs import Attachment, Entry
@@ -43,18 +44,23 @@ def home():
     winners = [first_with_year(teams, y) for y in years]
     winners = [w for w in winners if w]
 
+    num_matches = sum(t.num_matches_played for t in teams)
+    num_rounders = sum(t.num_rounders_scored for t in teams)
+
     df = pd.DataFrame(dict(
         id       = [t.id for t in winners],
         year     = [t.year for t in winners],
         name     = [fmt.AsTeamName(t) for t in winners],
         points   = [t.num_points for t in winners],
-        rounders = [fmt.AsScore(t.num_rounders_scored / max(t.num_matches_played, 1)) for t in winners]
+        rounders = [fmt.AsScore(t.num_rounders_scored / max(t.num_matches_played, 1)) for t in winners],
     ))
 
     return render_template(
         'home/index.html',
-        winners=df,
         title='Home',
+        winners=df,
+        total_matches=num_matches,
+        total_rounders=re.sub('\\.[0-9]*$', '½', str(num_rounders)),
     )
 
 

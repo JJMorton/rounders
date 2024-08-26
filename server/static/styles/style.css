@@ -550,6 +550,51 @@ figure > figcaption {
 	font-size: 20px;
 }
 
+.statistics {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: var(--content-padding);
+}
+
+.statistics > * {
+	width: 100%;
+	line-height: 70px;
+	border-radius: var(--corner-radius);
+	background-color: var(--color-bg-dim);
+	border: 1px solid var(--color-text-mid);
+	border-left: 15px solid var(--color-accent-dark);
+	color: var(--color-text-dark);
+	display: flex;
+	flex-direction: row;
+	padding: 0 var(--content-padding);
+	box-sizing: border-box;
+	gap: var(--content-padding);
+}
+
+.statistics > .reverse {
+	flex-direction: row-reverse;
+	border: 1px solid var(--color-text-mid);
+	border-right: 15px solid var(--color-accent-dark);
+}
+
+.statistics span {
+	vertical-align: middle;
+	text-align: left;
+}
+
+.statistics > .reverse > span {
+	text-align: right;
+}
+
+.statistics .number {
+	font-family: "Oswald", sans-serif;
+	font-size: 48px;
+}
+
+.statistics .desc {
+	flex: 1;
+}
+
 
 /* Rankings table */
 
