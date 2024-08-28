@@ -46,7 +46,7 @@
 				<th scope="column" class="center" title="Points">PTS</th>
 			</tr>
 	        {% for _, row in winners.iterrows() %}
-				<tr>
+				<tr class="animate-slide-right" style="animation-delay: {{ loop.index * 60 }}ms">
 					<td class="left">{{ row['year'] }}</td>
 					<td class="left"><strong><a href="/teams/{{ row['id'] }}">{{ row['name'] }}</a></strong></td>
 					<td class="center">{{ row['rounders'] }}</td>

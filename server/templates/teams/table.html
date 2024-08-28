@@ -31,7 +31,7 @@ INPUTS:
 
         </tr>
         {% for _, row in teams.iterrows() %}
-            <tr class="animate-slide-right" style="animation-delay: {{ loop.index * 30 }}ms">
+            <tr class="animate-slide-right" style="animation-delay: {{ loop.index * 60 }}ms">
                 <td class="left"><a class="highlight" href="/teams/{{ row['id'] }}">
                     <strong>{{ row['name'] }}</strong>
                 </a></td>
