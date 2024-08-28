@@ -29,8 +29,11 @@ def home():
     years = [y for y in years if y <= config.LAST_COMPLETE_YEAR][::-1]
 
     teams: list[Team] = db.session.scalars(
-        db
-        .select(Team)
+        db.select(Team)
+    ).all()
+
+    matches: list[Match] = db.session.scalars(
+        db.select(Match)
     ).all()
 
     teams = sorted(teams, key=lambda t: t.net_rounders, reverse=True)
@@ -44,7 +47,7 @@ def home():
     winners = [first_with_year(teams, y) for y in years]
     winners = [w for w in winners if w]
 
-    num_matches = sum(t.num_matches_played for t in teams)
+    num_matches = len([m for m in matches if m.played])
     num_rounders = sum(t.num_rounders_scored for t in teams)
 
     df = pd.DataFrame(dict(
