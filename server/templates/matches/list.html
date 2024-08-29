@@ -19,8 +19,10 @@ INPUTS:
             <li class="match-card">
                     <div class="date-time">
                         <span class="date">{{ match['date'] }}</span>
-                        <span>&#47;</span>
-                        <span class="time">{{ match['time'] }}</span>
+                        {% if match['time']|string %}
+                            <span>&#47;</span>
+                            <span class="time">{{ match['time'] }}</span>
+                        {% endif %}
                     </div>
                     <div class="teams-scores">
                         <div class="team-score">
