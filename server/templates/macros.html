@@ -1,7 +1,8 @@
-{% macro fancy_number_input(id, name, min, max, step, value='', class='') -%}
+{% macro fancy_number_input(id, name, min, max, step, value=0, class='', required=False) -%}
     <div class="fancy-number-input big">
         <button type="button" class="fancy-number-dec" for="{{ id }}">&minus;</button>
-        <input type="number" class="{{ class }}" name="{{ name }}" id="{{ id }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}"/>
+        <input type="number" class="{{ class }}" name="{{ name }}" id="{{ id }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}" {{ 'required' if required else '' }}/>
         <button type="button" class="fancy-number-inc" for="{{ id }}">&plus;</button>
     </div>
+    <script>fancyNumberInput("{{ id }}");</script>
 {%- endmacro %}

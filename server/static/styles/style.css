@@ -437,9 +437,21 @@ fieldset {
 	gap: 10px;
 }
 
+fieldset.invisible {
+	border: none;
+	padding: 0;
+	margin: 0;
+	background: none;
+}
+
+fieldset:disabled {
+	color: var(--color-text-mid);
+}
+
 legend {
 	color: var(--color-text-mid);
-	font-size: 80%;
+/*	font-size: 80%;*/
+	font-weight: bold;
 }
 
 .button-label-container {

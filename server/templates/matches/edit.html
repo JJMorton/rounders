@@ -6,47 +6,98 @@
 
 <section>
 
-<form method="POST" action="/matches/{{ id }}/edit?next={{ next }}">
+    <form
+        method="POST"
+        action="/matches/{{ id }}/edit?next={{ next }}"
+    >
 
-    <fieldset class="flex-responsive">
-        <legend>Teams</legend>
-        <select id="select-team1" disabled>
-            <option value="">{{ team1 }}</option>
-        </select>
-        <select id="select-team2" disabled>
-            <option value="">{{ team2 }}</option>
-        </select>
-    </fieldset>
+        <fieldset>
+            <legend>Teams</legend>
+            <select id="select-team1" disabled>
+                <option value="">{{ team1 }}</option>
+            </select>
+            <select id="select-team2" disabled>
+                <option value="">{{ team2 }}</option>
+            </select>
+            <label for="datetbc">
+                <input type="checkbox" name="datetbc" id="datetbc" for="fields-schedule" {{ 'checked' if not date|string else '' }}/>
+                Date TBC
+            </label>
+            <label for="unplayed">
+                <input type="checkbox" name="unplayed" id="unplayed" for="fields-scores" {{ 'checked' if not played else '' }}/>
+                Match is unplayed
+            </label>
+        </fieldset>
 
-    <fieldset class="flex-responsive">
-        <legend>Schedule</legend>
-        <input type="date" name="date" min="{{ year }}-01-01" max="{{ year }}-12-31" value="{{ date }}"/>
-        <input type="time" name="time" value="{{ time }}"/>
-    </fieldset>
+        <fieldset class="flex-responsive can-toggle inverse" id="fields-schedule">
+            <legend>
+                Schedule
+            </legend>
+            <input
+                type="date" name="date" required
+                min="{{ year }}-01-01" max="{{ year }}-12-31" value="{{ date }}"
+            />
+            <input type="time" name="time" value="{{ time }}" required/>
+        </fieldset>
 
-    <fieldset>
-        <legend>Inning 1</legend>
-        <label class="label-team1" for="score1-in1">Team 1</label>
-        {{ macros.fancy_number_input(id='score1-in1', name='score1_in1', min=0, max=99, step=0.5, value=score1_in1, class='score-input') }}
-        <label class="label-team2" for="score2-in1">Team 2</label>
-        {{ macros.fancy_number_input(id='score2-in1', name='score2_in1', min=0, max=99, step=0.5, value=score2_in1, class='score-input') }}
-    </fieldset>
+        <fieldset class="can-toggle inverse invisible" id="fields-scores">
 
-    <fieldset>
-        <legend>Inning 2</legend>
-        <label class="label-team1" for="score1-in2">Team 1</label>
-        {{ macros.fancy_number_input(id='score1-in2', name='score1_in2', min=0, max=99, step=0.5, value=score1_in2, class='score-input') }}
-        <label class="label-team2" for="score2-in2">Team 2</label>
-        {{ macros.fancy_number_input(id='score2-in2', name='score2_in2', min=0, max=99, step=0.5, value=score2_in2, class='score-input') }}
-    </fieldset>
+            <fieldset class="can-toggle inverse" id="fields-team1">
+                <legend>
+                    <output for="team1">{{ team1 }}</output>
+                    <label for="dnf1">
+                        <input type="checkbox" name="dnf1" id="dnf1" for="fields-team1" {{ 'checked' if played and not score1_in1 else '' }}/>
+                        DNF
+                    </label>
+                </legend>
+                <label class="label-team1" for="score1-in1">Inning 1</label>
+                {{ macros.fancy_number_input(
+                    id='score1-in1', name='score1_in1',
+                    value=score1_in1, min=0, max=99, step=0.5,
+                    required=True,
+                    class='score-input'
+                ) }}
+                <label class="label-team1" for="score1-in2">Inning 2</label>
+                {{ macros.fancy_number_input(
+                    id='score1-in2', name='score1_in2',
+                    value=score1_in2, min=0, max=99, step=0.5,
+                    required=True,
+                    class='score-input'
+                ) }}
+            </fieldset>
 
-    <div class="flex-responsive">
-        <button type="button" onclick="window.location.href='{{ next }}'" class="large-button cancel">Cancel</button>
-        <button type="reset" class="large-button cancel">Reset</button>
-	    <button class="large-button" type="submit">Update</button>
-	</div>
+            <fieldset class="can-toggle inverse" id="fields-team2">
+                <legend>
+                    <output for="team2">{{ team2 }}</output>
+                    <label for="dnf2">
+                        <input type="checkbox" name="dnf2" id="dnf2" for="fields-team2" {{ 'checked' if played and not score2_in1 else '' }}/>
+                        DNF
+                    </label>
+                </legend>
+                <label class="label-team2" for="score2-in1">Inning 1</label>
+                {{ macros.fancy_number_input(
+                    id='score2-in1', name='score2_in1',
+                    value=score2_in1, min=0, max=99, step=0.5,
+                    required=True,
+                    class='score-input'
+                ) }}
+                <label class="label-team2" for="score2-in2">Inning 2</label>
+                {{ macros.fancy_number_input(
+                    id='score2-in2', name='score2_in2',
+                    value=score2_in2, min=0, max=99, step=0.5,
+                    required=True,
+                    class='score-input'
+                ) }}
+            </fieldset>
 
-</form>
+        </fieldset>
+
+        <div class="flex-responsive">
+            <button type="button" onclick="window.location.href='{{ next }}'" class="large-button cancel">Cancel</button>
+            <button class="large-button" type="submit">Save</button>
+        </div>
+
+    </form>
 
 </section>
 

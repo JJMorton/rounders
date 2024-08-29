@@ -34,33 +34,24 @@ function removeRow(button) {
 	row.remove();
 }
 
-window.addEventListener('load', function() {
+function fancyNumberInput(id) {
+	const dec = document.querySelector(`.fancy-number-dec[for='${id}']`);
+	const inc = document.querySelector(`.fancy-number-inc[for='${id}']`);
+	const inp = document.getElementById(id);
+	dec.addEventListener('click', () => inp.stepDown());
+	inc.addEventListener('click', () => inp.stepUp());
+}
 
-	for (const elt of document.getElementsByClassName('fancy-number-inc')) {
-		const inp = document.getElementById(elt.getAttribute('for'));
-		elt.addEventListener('click', () => inp.stepUp());
-	}
+window.addEventListener("load", function() {
 
-	for (const elt of document.getElementsByClassName('fancy-number-dec')) {
-		const inp = document.getElementById(elt.getAttribute('for'));
-		elt.addEventListener('click', () => inp.stepDown());
-	}
-
-	for (const label of document.getElementsByClassName('label-team1')) {
-		const select = document.getElementById('select-team1');
-		const update = () => {
-			label.textContent = select.options[select.selectedIndex].text;
-		}
-		select.addEventListener('input', update);
-		update();
-	}
-
-	for (const label of document.getElementsByClassName('label-team2')) {
-		const select = document.getElementById('select-team2');
-		const update = () => label.textContent = select.options[select.selectedIndex].text;
-		select.addEventListener('input', update);
+	for (const elt of document.getElementsByClassName('can-toggle')) {
+		if (!elt.id) continue;
+		const inverse = elt.classList.contains('inverse')
+		const toggle = document.querySelector(`input[type="checkbox"][for="${elt.id}"]`)
+		if (!toggle) continue;
+		const update = () => elt.disabled = inverse ? toggle.checked : !toggle.checked;
+		toggle.addEventListener('change', update);
 		update();
 	}
 
 });
-

@@ -431,7 +431,7 @@ def route_matches_post():
         score1_in1=innings1[0],
         score2_in1=innings2[0],
         play_date=date
-    ) # type: ignore
+    )
 
     db.session.add(match)
     db.session.commit()
@@ -467,7 +467,7 @@ def route_matches_postform():
     ).all()
 
     # Create table of teams for the form options
-    teams_df = pd.DataFrame(dict(
+    teams_df: pd.DataFrame = pd.DataFrame(dict(
         id          = [t.id for t in teams],
         name        = [fmt.AsTeamName(t) for t in teams],
     )).sort_values('name')
@@ -528,6 +528,7 @@ def route_match_patchform(id):
         team2      = fmt.AsTeamName(match.team2),
         date       = fmt.AsDateInput(match.play_date),
         time       = fmt.AsTimeInput(match.play_date),
+        played     = match.played,
         # FIXME: For matches where the innings were not recorded
         # separately, put the total score in inning 1.
         score1_in1 = match.score1_in1 or match.score1,
