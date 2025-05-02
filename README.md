@@ -5,7 +5,7 @@ The database is *SQLite*, and the [SQLAlchemy](https://www.sqlalchemy.org/) Pyth
 
 ## Setup
 Requires Python >= **3.11**.
-1. Install required packages with `pip install -r requirements.txt`.
+1. Install the project using the `pyproject.toml` file.  I highly recommend using [uv](https://docs.astral.sh/uv/) for this.
 2. Create a `.env` file to define needed environment variables in the format `ENV_VAR=...`.
     - `SECRET_KEY` -- generate according to [the flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/#SECRET_KEY)
     - `ADMIN_PASSWORD_HASH` -- generate using `werkzeug.security.generate_password_hash`, docs [here](https://werkzeug.palletsprojects.com/en/3.0.x/utils/#werkzeug.security.generate_password_hash)
