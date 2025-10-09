@@ -37,3 +37,13 @@ namespaces = false
 
 [tool.basedpyright]
 typeCheckingMode = "basic"
+
+[tool.uv.sources]
+numpy = { index = "piwheels" }
+pandas = { index = "piwheels" }
+pillow = { index = "piwheels" }
+
+[[tool.uv.index]]
+name = "piwheels"
+url = "https://www.piwheels.org/simple"
+explicit = true
