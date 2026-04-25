@@ -4,5 +4,6 @@ __pycache__/
 pyrightconfig.json
 /instance/
 .env
+*.egg-info/
 
 !/example/*
