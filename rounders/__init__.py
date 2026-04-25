@@ -2,9 +2,12 @@
 The Flask server and SQLite database
 """
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 from pathlib import Path
 
-from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
@@ -12,9 +15,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase
 
 import config
-
-# Load environment variables from .env file
-load_dotenv()
 
 # --------------------------------------------
 # Create flask server
