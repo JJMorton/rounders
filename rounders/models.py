@@ -4,13 +4,14 @@ Data models to represent entities in the database
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, or_
-from dataclasses import dataclass
 
-from . import db, app
+from sqlalchemy import ForeignKey, or_
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from . import app, db
 
 
 @dataclass(frozen=True)

@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 
 from abc import ABC, abstractmethod
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 import functools
 from typing import Any, Optional
 
@@ -187,4 +187,4 @@ def basic_sanitisation(s: str) -> str:
     the string is being used.
     """
     forbid_chars = ['\\', '\'', '"', ';', '<', '>']
-    return ''.join(ch for ch in s if not ch in forbid_chars)
+    return ''.join(ch for ch in s if ch not in forbid_chars)

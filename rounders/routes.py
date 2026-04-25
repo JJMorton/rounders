@@ -3,23 +3,24 @@ Defines the endpoints available (i.e. the valid paths that users can make reques
 and their responses.
 """
 
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Sequence
+
+import pandas as pd
 from dateutil import parser
-import config
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_required
-import pandas as pd
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
-import re
 
-from .models import Team, Player, Match
-from .blogs import Attachment, Entry
-from . import app
-from . import db
+import config
+
+from . import app, db
 from . import formatting as fmt
+from .blogs import Attachment, Entry
+from .models import Match, Player, Team
 
 
 @app.route('/')
@@ -110,7 +111,7 @@ def route_teams():
 
     return render_template(
         template,
-        title    = f'Team Standings',
+        title    = 'Team Standings',
         teams    = teams_df,
         year     = year,
         detailed = 'detailed' in request.args,
@@ -123,7 +124,7 @@ def route_teams():
 def route_teams_post():
     """Create a team"""
 
-    redirect_url = request.args.get("next", default=f'/teams', type=str)
+    redirect_url = request.args.get("next", default='/teams', type=str)
 
     year = request.form.get("year", type=int)
     if not year:
@@ -296,7 +297,7 @@ def route_team_delete(id):
     """Delete a team"""
 
     team = db.get_or_404(Team, int(id))
-    redirect_url = request.args.get("next", default=f'/teams', type=str)
+    redirect_url = request.args.get("next", default='/teams', type=str)
 
     team_name = team.name
 
@@ -371,7 +372,7 @@ def route_matches():
     )).sort_values('date')
 
     groupby = request.args.get('groupby')
-    if not groupby in matches_df:
+    if groupby not in matches_df:
         groupby = 'week'
 
     # Render only the list if the request is from htmx
@@ -379,7 +380,7 @@ def route_matches():
 
     return render_template(
         template,
-        title   = f'Matches',
+        title   = 'Matches',
         matches = matches_df,
         groupby = groupby,
         years   = years,
@@ -392,7 +393,7 @@ def route_matches():
 def route_matches_post():
     """Create a match"""
 
-    redirect_url = request.args.get('next', default=f'/matches/create', type=str)
+    redirect_url = request.args.get('next', default='/matches/create', type=str)
 
     team1_id = request.form.get("team1", type=int)
     team2_id = request.form.get("team2", type=int)
@@ -486,7 +487,7 @@ def route_matches_postform():
 def route_match_patch(id):
     """Edit a match"""
 
-    redirect_url = request.args.get("next", default=f'/matches', type=str)
+    redirect_url = request.args.get("next", default='/matches', type=str)
 
     match = db.get_or_404(Match, int(id))
 
@@ -545,7 +546,7 @@ def route_match_patchform(id):
 def route_match_delete(id):
     """Delete a match"""
 
-    redirect_url = request.args.get("next", default=f'/matches', type=str)
+    redirect_url = request.args.get("next", default='/matches', type=str)
 
     match = db.session.scalar(
         db
@@ -560,7 +561,7 @@ def route_match_delete(id):
     db.session.delete(match)
     db.session.commit()
 
-    flash(f"Removed match")
+    flash("Removed match")
     return redirect(redirect_url)
 
 
@@ -673,7 +674,7 @@ def route_photo_delete(id):
     """Delete a blog entry"""
 
     entry = db.get_or_404(Entry, int(id))
-    redirect_url = request.args.get("next", default=f'/photos', type=str)
+    redirect_url = request.args.get("next", default='/photos', type=str)
 
     for a in entry.attachments:
         a.delete()
@@ -682,5 +683,5 @@ def route_photo_delete(id):
     db.session.delete(entry)
     db.session.commit()
 
-    flash(f"Removed post")
+    flash("Removed post")
     return redirect(redirect_url)

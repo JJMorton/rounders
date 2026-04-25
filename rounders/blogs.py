@@ -4,17 +4,17 @@ Data models for blog posts in the database
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Optional
-import warnings
-from PIL import Image
 
+from PIL import Image
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import config
 
-from . import db, app
+from . import app, db
 
 
 class Attachment(db.Model):

@@ -3,18 +3,18 @@ The Flask server and SQLite database
 """
 
 from pathlib import Path
+
+from dotenv import load_dotenv
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import DeclarativeBase
+
 import config
 
 # Load environment variables from .env file
-from dotenv import load_dotenv
 load_dotenv()
-
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
-
 
 # --------------------------------------------
 # Create flask server
@@ -49,7 +49,4 @@ def _set_sqlite_pragma(dbapi_connection, _):
 # --------------------------------------------
 # Import submodules
 
-from . import models
-from . import blogs
-from . import routes
-from . import auth
+from . import auth, blogs, models, routes
